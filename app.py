@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, extract
 from sqlalchemy.orm import joinedload
 import os
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -291,6 +292,102 @@ def admin_required(f):
             return redirect(url_for('dashboard'))
         return f(*args, **kwargs)
     return decorated_function
+
+@app.route('/categories')
+@login_required
+def list_categories():
+    page_title= "Categories Overview"
+    page_subtitle = "You can view and manage asset categories here"
+    categories = AssetCategory.query.all()
+
+    category_counts_query = db.session.query(
+        AssetCategory.id,
+        func.count(Asset.id).label('asset_count')
+    ).outerjoin(Asset, AssetCategory.id == Asset.category_id)\
+      .group_by(AssetCategory.id).all()
+    
+    category_counts = {cat_id: count for cat_id, count in category_counts_query}
+
+    for category in categories:
+        category.asset_count = category_counts.get(category.id, 0)
+
+    return render_template('categories_list.html', title="Asset Categories", categories=categories, page_title=page_title, page_subtitle=page_subtitle)
+
+@app.route('/categories/add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_category():
+    page_title= "Add a Category"
+    page_subtitle = "Add a new asset category"
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form.get('description')
+        if not name:
+            flash('Category Name is required.', 'danger')
+        elif AssetCategory.query.filter_by(name=name).first():
+            flash(f'Category {name} already exists.', 'danger')
+        else:
+            new_category = AssetCategory(name=name, description=description)
+            try:
+                db.session.add(new_category)
+                db.session.commit()
+                flash('Category added successfully!', 'success')
+                return redirect(url_for('list_categories'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'An error occurred: {str(e)}', 'danger')
+                app.logger.error(f"Error adding category: {e}")
+                return render_template('category_form.html', title='Add Category', form_action_url=url_for('add_category'), request_form=request.form)
+    return render_template('category_form.html', title='Add Category', form_action_url=url_for('add_category'), page_title=page_title, page_subtitle=page_subtitle)
+
+@app.route('/categories/edit/<int:category_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_category(category_id):
+    page_title= "Edit a Category"
+    page_subtitle = "Edit an existing asset category"
+    category_to_edit = AssetCategory.query.get_or_404(category_id)
+    if request.method == 'POST':
+        new_name = request.form['name']
+        description = request.form.get('description')
+        if not new_name:
+            flash('Category name is required.', 'danger')
+            return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('edit_category', category_id=category_id), request_form=request.form)
+        elif new_name != category_to_edit.name and AssetCategory.query.filter_by(name=new_name).first():
+            flash(f'Category name "{new_name}" already exists.', 'danger')
+            return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('edit_category', category_id=category_id), request_form=request.form)
+        else:
+            category_to_edit.name = new_name
+            category_to_edit.description = description
+            try:
+                db.session.commit()
+                flash('Category updated successfully!', 'success')
+                return redirect(url_for('list_categories'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Error updating category: {str(e)}', 'danger')
+                app.logger.error(f"Error updating category: {e}")
+                return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('edit_category', category_id=category_id), request_form=request.form)
+    return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('edit_category', category_id=category_id), page_title=page_title, page_subtitle=page_subtitle)
+
+    
+@app.route('/categories/delete/<int:category_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_category(category_id):
+    category_to_delete = AssetCategory.query.get_or_404(category_id)
+    if Asset.query.filter_by(category_id=category_id).first():
+        flash('Cannot delete category, it is currently associated with one or more assets', 'danger')
+        return redirect(url_for('list_categories'))
+    try:
+        db.session.delete(category_to_delete)
+        db.session.commit()
+        flash('Category deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting category: {str(e)}', 'danger')
+        app.logger.error(f"Error deleting category: {e}")
+    return redirect(url_for('list_categories'))
 
 def create_initial_data():
     with app.app_context():
