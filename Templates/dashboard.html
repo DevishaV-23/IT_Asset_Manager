@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/dashboard.css') }}"
+/>
+<body>
+
+  <main class="main-content">
+    <section class="grid">
+      <div class="grid-box">
+        <h3 class="box-title">Total Assets</h3>
+        <p class="box value1">{{ total_assets }}</p>
+      </div>
+      <div class="grid-box">
+        <h3 class="box-title">Active Assets</h3>
+        <p class="box value2">{{ active_assets }}</p>
+      </div>
+      <div class="grid-box">
+        <h3 class="box-title">Assets In Repair</h3>
+        <p class="box value3">{{ in_repair_assets }}</p>
+      </div>
+      <div class="grid-box">
+        <h3 class="box-title">Retired Assets</h3>
+        <p class="box value4">{{ retired_assets }}</p>
+      </div>
+      <div class="grid-box">
+        <h3 class="box-title">Assets this month</h3>
+        <p class="box value5">{{ new_assets_this_month }}</p>
+      </div>
+    </section>
+  </main>
+</body>
+{% endblock %}
