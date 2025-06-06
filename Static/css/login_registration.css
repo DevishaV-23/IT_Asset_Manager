@@ -1,0 +1,148 @@
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  font-family: "Inter", sans-serif;
+  
+}
+
+.main-content {
+  height: 100vh;
+  width: 100vw;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.account_page {
+  background-color: #fff;
+  padding: 32px;
+  padding-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1),   /* Left */
+  4px 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+ 
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 8px;
+  margin-top: 0px;
+  text-align: center;
+}
+
+.blue {
+  color: #2563eb;
+}
+
+.subtitle {
+  margin-top: 20px;
+  color: #6b7280;
+}
+
+.form {
+  margin-top: 24px;
+}
+
+.name {
+  margin-bottom: 20px;
+}
+
+.username {
+  margin-bottom: 20px;
+}
+
+.password {
+  margin-bottom: 20px;
+}
+
+.email{
+    margin-bottom: 20px;
+}
+
+.confirm_password{
+    margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  color: #374151;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding-left: 14px;
+  padding-right: 16px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.form-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #3b82f6;
+  border-color: #3b82f6;
+}
+
+.form-input::placeholder{
+    color: #b8bdc5;
+    
+}
+
+.btn-primary {
+  width: 100%;
+  background-color: #2563eb;
+  color: #fff;
+  padding-top: 11px;
+  padding-bottom: 11px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #2563eb80;
+}
+
+.account {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.account-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.alert{
+  width: 108%;
+}
