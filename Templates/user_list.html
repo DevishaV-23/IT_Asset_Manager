@@ -3,9 +3,13 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/user_list.css') }}"
 />
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/list.css') }}"
+/>
 <body>
   <main class="main-content">
-    <section class="all-users">
+    <section class="all-items">
       <div>
         {% with messages = get_flashed_messages(with_categories=true) %} 
         {% if messages %}
@@ -61,7 +65,7 @@
               <td class="table-data">{{ user_item.email }}</td>
               <td class="table-data">
                  <span
-                  class="role-label {% if user_item.role == 'admin' %} role-admin {% else %} role-regular {% endif %}"
+                  class="item-label {% if user_item.role == 'admin' %} role-admin {% else %} role-regular {% endif %}"
                 >
                   {{ user_item.role }}
                 </span>

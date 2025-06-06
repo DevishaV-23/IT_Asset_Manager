@@ -3,10 +3,13 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/assets_list.css') }}"
 />
-
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/list.css') }}"
+/>
 <body>
   <main class="main-content">
-    <section class="all-assets">
+    <section class="all-items">
       <div>
         {% with messages = get_flashed_messages(with_categories=true) %} {% if
         messages %}
@@ -62,7 +65,7 @@
               <td class="table-data">{{ asset.category.name if asset.category else 'N/A' }}</td>
               <td class="table-data">
                 <span
-                  class="status-label {% if asset.status == 'In Use' %} status-in-use {% elif asset.status == 'In Repair' %} status-in-repair {% elif asset.status == 'Retired' %} status-retired {% else %} status-default {% endif %}"
+                  class="item-label {% if asset.status == 'In Use' %} status-in-use {% elif asset.status == 'In Repair' %} status-in-repair {% elif asset.status == 'Retired' %} status-retired {% else %} status-default {% endif %}"
                 >
                   {{ asset.status }}
                 </span>
