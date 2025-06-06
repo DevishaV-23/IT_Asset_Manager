@@ -1,0 +1,94 @@
+{% extends "base.html" %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/login_registration.css') }}"
+/>
+<body>
+  <main class="main-content">
+    <div>
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %}
+      <div class="mb-4">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+      <div class="account_page">
+        <div class="logo">
+          <h1 class="title"><span class="blue">IT </span>Asset Manager</h1>
+          <p class="subtitle">Create your account</p>
+        </div>
+        <form method="POST" action="{{ url_for('register') }}" class="form">
+          <div class="name">
+            <label for="name" class="form-label">Name</label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              class="form-input"
+              value="{{ request_form.name if request_form else '' }}"
+              placeholder="Sam"
+              required
+            />
+          </div>
+          <div class="username">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              class="form-input"
+              value="{{ request_form.name if request_form else '' }}"
+              placeholder="sam_1"
+              required
+            />
+          </div>
+          <div class="email">
+            <label for="email" class="form-label">Email Address</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              class="form-input"
+              value="{{ request_form.name if request_form else '' }}"
+              placeholder="sam_p@email.com"
+              required
+            />
+          </div>
+          <div class="password">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              class="form-input"
+              placeholder="Enter Password"
+              required
+            />
+          </div>
+          <div class="confirm_password">
+            <label for="confirm_password" class="form-label"
+              >Confirm Password</label
+            >
+            <input
+              type="password"
+              name="confirm_password"
+              id="confirm_password"
+              class="form-input"
+              placeholder="Confirm Password"
+            />
+          </div>
+          <div>
+            <button type="submit" class="btn-primary">Register</button>
+          </div>
+        </form>
+        <p class="account">
+          Already have an account?
+          <a href="{{ url_for('login') }}" class="account-link">Login here</a>
+        </p>
+      </div>
+    </div>
+  </main>
+</body>
+{% endblock %}
