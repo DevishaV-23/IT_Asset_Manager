@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import joinedload
 import os
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash   
-from datetime import datetime, date, timezone
+from datetime import datetime, timezone
+from functools import wraps
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -136,6 +138,160 @@ def login():
         else:
             flash('Invalid username or password.', 'danger')
     return render_template('login.html', title="Login")
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('login'))
+
+@app.route('/assets')
+@login_required
+def list_assets():
+    page_title= "Assets Overview"
+    page_subtitle = "You cna view and manage all your IT assets here"
+    assets = Asset.query.options(joinedload(Asset.creator)).all()
+    return render_template('assets_list.html', title="IT Assets", assets=assets, page_title=page_title, page_subtitle=page_subtitle)
+
+@app.route('/assets/add', methods=['GET', 'POST'])
+@login_required
+def add_asset():
+    page_title= "Add an Asset"
+    page_subtitle = "Add a new asset"
+    categories = AssetCategory.query.all()
+    if request.method == 'POST':
+        asset_name = request.form['asset_name']
+        asset_tag = request.form['asset_tag']
+        serial_number = request.form['serial_number']
+        try: 
+            purchase_date_str = request.form.get('purchase_date')
+            purchase_date = datetime.strptime(purchase_date_str, '%Y-%m-%d') if purchase_date_str else None
+        except ValueError:
+            flash('Invalid purchase date format. Please use the date picker or YYYY-MM-DD format.', 'danger')
+            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('add_asset'), request_form=request.form)
+        
+        purchase_cost_str = request.form.get('purchase_cost')
+        purchase_cost = float(purchase_cost_str) if purchase_cost_str else None
+        vendor = request.form.get('vendor')
+        location = request.form.get('location')
+        status = request.form['status']
+        description = request.form.get('description')
+        category_id = request.form.get('category')
+
+        if not asset_name or not asset_tag or not status or not category_id:
+            flash('Asset Name, Asset Tag, Status, and Category are required.', 'danger')
+            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('add_asset'), request_form=request.form)
+        
+        elif Asset.query.filter_by(asset_tag=asset_tag).first():
+            flash(f'Asset Tag {asset_tag} already exists.', 'danger')
+            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('add_asset'), request_form=request.form)
+        
+        elif serial_number and Asset.query.filter_by(serial_number=serial_number).first():
+            flash(f'Serial Number {serial_number} already exists.', 'danger')
+            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('add_asset'), request_form=request.form)
+        else:
+            new_asset = Asset(
+                asset_name=asset_name,
+                asset_tag=asset_tag,
+                serial_number=serial_number,
+                purchase_date=purchase_date,
+                purchase_cost=purchase_cost,
+                vendor=vendor,
+                storage_location=location,
+                status=status,
+                description=description,
+                category_id=category_id,
+                created_by_user_id=current_user.id
+            )
+            try:
+                db.session.add(new_asset)
+                db.session.commit()
+                flash('Asset added successfully!', 'success')
+                return redirect(url_for('list_assets'))
+            except Exception as e:
+                db.session.rollback()
+                flash(f'An error occurred: {str(e)}', 'danger')
+                app.logger.error(f"Error adding asset: {e}")
+                return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('add_asset'), request_form=request.form)
+    return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
+
+@app.route('/assets/edit/<int:asset_id>', methods=['GET', 'POST'])
+@login_required
+def edit_asset(asset_id):
+    page_title= "Edit an Asset"
+    page_subtitle = "Edit an exisiting asset"
+    asset_to_edit = Asset.query.get_or_404(asset_id)
+    categories = AssetCategory.query.all()
+    if request.method =='POST':
+        original_asset_tag = asset_to_edit.asset_tag
+        new_asset_tag = request.form['asset_tag']
+        if new_asset_tag != original_asset_tag and Asset.query.filter_by(asset_tag=new_asset_tag).first():
+            flash(f'Asset Tag {new_asset_tag} already exists.', 'danger')
+            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('edit_asset', asset_id=asset_id), request_form=request.form)
+        
+        original_serial_number = asset_to_edit.serial_number
+        new_serial_number = request.form.get('serial_number')
+        if new_serial_number and new_serial_number != original_serial_number and Asset.query.filter_by(serial_number=new_serial_number).first():
+            flash(f'Serial Number {new_serial_number} already exists.', 'danger')
+            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('edit_asset', asset_id=asset_id), request_form=request.form)  
+        
+        asset_to_edit.asset_name = request.form['asset_name']
+        asset_to_edit.asset_tag = new_asset_tag
+        asset_to_edit.serial_number = new_serial_number
+        try:
+            purchase_date_str = request.form.get('purchase_date')
+            asset_to_edit.purchase_date = datetime.strptime(purchase_date_str, '%Y-%m-%d').date() if purchase_date_str else None
+        except ValueError:
+            flash('Invalid purchase date. Please use the date picker or YYYY-MM-DD format.', 'danger')
+            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('edit_asset', asset_id=asset_id), request_form=request.form)
+
+        purchase_cost_str = request.form.get('purchase_cost')
+        asset_to_edit.purchase_cost = float(purchase_cost_str) if purchase_cost_str else None
+        asset_to_edit.vendor = request.form.get('vendor')
+        asset_to_edit.location = request.form.get('location')
+        asset_to_edit.status = request.form['status']
+        asset_to_edit.description = request.form.get('description')
+        asset_to_edit.category_id = request.form.get('category')
+        try:
+            db.session.commit()
+            flash('Asset updated successfully!', 'success')
+            return redirect(url_for('list_assets'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+            app.logger.error(f"Error updating asset: {e}") 
+            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('edit_asset', asset_id=asset_id), request_form=request.form)
+    return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('edit_asset', asset_id=asset_id), page_title=page_title, page_subtitle=page_subtitle)
+
+@app.route('/assets/delete/<int:asset_id>', methods=['POST'])
+@login_required
+def delete_asset(asset_id):
+    if current_user.role != 'admin':
+        flash('You do not have permission to delete assets.', 'danger')
+        return redirect(url_for('list_assets'))
+    asset_to_delete = Asset.query.get_or_404(asset_id)
+    try:
+        db.session.delete(asset_to_delete)
+        db.session.commit()
+        flash('Asset deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'An error occurred: {str(e)}', 'danger')
+        app.logger.error(f"Error deleting asset: {e}")
+    return redirect(url_for('list_assets'))
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login', next=request.url))
+        if current_user.role != 'admin':
+            flash('You do not have permission to access this page.', 'danger')
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 def create_initial_data():
     with app.app_context():
         db.create_all()
@@ -164,4 +320,5 @@ def create_initial_data():
             print(f"Error during initial data creation: {e}")
 
 if __name__ == '__main__':
+    create_initial_data()
     app.run(debug=True)
