@@ -1,0 +1,129 @@
+{% extends "base.html" %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/profile_form.css') }}"
+/>
+
+<body>
+  <main class="main-content">
+    <section class="form-section">
+      <div>
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="mb-4">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+      </div>
+      <h2 class="section-title">User Information</h2>
+
+      <form
+        method="POST"
+        action="{{ url_for('edit_profile') }}"
+      >
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name" class="form-label">Name</label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value="{{ request_form.name if request_form else user_to_edit.name }}"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              value="{{ request_form.username if request_form else user_to_edit.username }}"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              value="{{ request_form.email if request_form else user_to_edit.email}}"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="current_password" class="form-label">Current Password</label>
+            <input
+              type="password"
+              name="current_password"
+              id="current_password"
+              autocomplete="current-password"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="new_password" class="form-label">New Password</label>
+            <input
+              type="password"
+              name="new_password"
+              id="new_password"
+              autocomplete="new-password"
+              class="form-input"
+              required
+            />
+          </div>
+           <div class="form-group">
+            <label for="confirm_new_password" class="form-label">Confirm New Password</label>
+            <input
+              type="password"
+              name="confirm_new_password"
+              id="confirm_new_password"
+              autocomplete="new-password"
+              class="form-input"
+              required
+            />
+          </div>
+           <div class="form-group">
+            <label for="role" class="form-label">Role</label>
+            <input
+              type="text"
+              name="role"
+              id="role"
+              value="{{ request_form.role if request_form else user_to_edit.role}}"
+              class="form-input"
+              disabled
+            />
+          </div>
+          <div class="form-group">
+            <label for="registered_date" class="form-label">Registration Date</label>
+            <input
+              type="datetime"
+              name="registered_date"
+              id="registered_date"
+              value="{{ user_to_edit.registration_date.strftime('%Y-%m-%d %H:%M') if user_to_edit.registration_date else 'N/A' }}"
+              class="form-input"
+              disabled
+            />
+          </div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <a href="{{ url_for('dashboard') }}" class="btn btn-secondary"
+            >Cancel</a
+          >
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+{% endblock %}
