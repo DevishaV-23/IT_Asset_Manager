@@ -147,6 +147,29 @@ def logout():
     flash('You have been logged out.', 'success')
     return redirect(url_for('login'))
 
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    page_title= f"Welcome, { current_user.name if current_user.name else current_user.username }"
+    page_subtitle = f"Your role is: { current_user.role }"
+    total_assets = Asset.query.count()
+    active_assets = Asset.query.filter_by(status='In Use').count()
+    in_repair_assets = Asset.query.filter_by(status='In Repair').count()
+    retired_assets = Asset.query.filter_by(status='Retired').count()
+    
+    now_utc = datetime.now(timezone.utc)
+    current_month = now_utc.month
+    current_year = now_utc.year
+    new_assets_this_month = Asset.query.filter(
+        extract('month', Asset.added_on) == current_month,
+        extract('year', Asset.added_on) == current_year
+    ).count()
+
+    return render_template('dashboard.html', title="Dashboard", total_assets=total_assets,
+                           active_assets=active_assets, in_repair_assets=in_repair_assets,
+                           retired_assets=retired_assets, new_assets_this_month=new_assets_this_month, page_title=page_title, page_subtitle=page_subtitle
+      )
+
 @app.route('/assets')
 @login_required
 def list_assets():
