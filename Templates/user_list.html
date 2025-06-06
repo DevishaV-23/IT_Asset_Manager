@@ -1,0 +1,106 @@
+{% extends "base.html" %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/user_list.css') }}"
+/>
+<body>
+  <main class="main-content">
+    <section class="all-users">
+      <div>
+        {% with messages = get_flashed_messages(with_categories=true) %} 
+        {% if messages %}
+        <div class="mb-4">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+      </div>
+      <div class="table-header">
+        <h2 class="title">All Users</h2>
+        <a href="{{ url_for('add_user') }}" class="btn-primary">
+          <svg
+            class="icon"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            ></path>
+          </svg>
+          Add New User
+        </a>
+      </div>
+      {% if users %}
+      <div class="table">
+        <table class="main-table">
+          <thead class="table-head">
+            <tr>
+              <th scope="col" class="column-title">ID</th>
+              <th scope="col" class="column-title">Name</th>
+              <th scope="col" class="column-title">Username</th>
+              <th scope="col" class="column-title">Email</th>
+              <th scope="col" class="column-title">Role</th>
+              <th scope="col" class="column-title">Registration Date</th>
+              <th scope="col" class="column-title">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="table-body">
+            {% for user_item in users %}
+            <tr>
+              <td class="table-data">{{ user_item.id }}</td>
+              <td class="table-data">{{ user_item.name }}</td>
+              <td class="table-data">{{ user_item.username }}</td>
+              <td class="table-data">{{ user_item.email }}</td>
+              <td class="table-data">
+                 <span
+                  class="role-label {% if user_item.role == 'admin' %} role-admin {% else %} role-regular {% endif %}"
+                >
+                  {{ user_item.role }}
+                </span>
+              </td>
+              <td class="table-data">{{ user_item.registration_date.strftime('%Y-%m-%d') if user_item.registration_date else 'N/A' }}</td>
+              <td class="table-data">
+                <a
+                  href="{{ url_for('edit_user', user_id=user_item.id) }}"
+                  class="edit"
+                  title="Edit"
+                >
+                  Edit
+                </a>
+                {% if current_user.id != user_item.id %}
+                <form
+                  action="{{ url_for('delete_user', user_id=user_item.id) }}"
+                  method="POST"
+                  class="inline-block"
+                  onsubmit="return confirm('Are you sure you want to delete user {{ user_item.username }}? This action cannot be undone.');"
+                >
+                  <button type="submit" class="delete" title="Delete">
+                    Delete
+                  </button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-10">
+        <i class="fas fa-users fa-3x text-gray-400 mb-4"></i>
+        <p class="text-gray-600 text-lg">No users found.</p>
+    </div>
+    {% endif %}
+    </section>
+  </main>
+</body>
+{% endblock %}
+
