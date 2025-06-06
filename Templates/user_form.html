@@ -1,0 +1,121 @@
+{% extends "base.html" %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/user_form.css') }}"
+/>
+
+<body>
+  <main class="main-content">
+    <section class="form-section">
+      <div>
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="mb-4">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+      </div>
+      <h2 class="section-title {% if form_mode == 'edit' %} edit {% else %} add {% endif %}">User Information</h2>
+
+      {% set form_action_url = url_for('add_user') if form_mode == 'add' else
+      url_for('edit_user', user_id=user_to_edit.id) %} {% if form_mode == 'edit'
+      and user_to_edit %}
+      <p class="info">
+        User password changes are handled by the user via their profile page or
+        password reset functionality.
+        <br />Registered On: {{
+        user_to_edit.registration_date.strftime('%Y-%m-%d %H:%M:%S %Z') if
+        user_to_edit.registration_date else 'N/A' }}<br />
+      </p>
+      {% endif %}
+      <form method="POST" action="{{ form_action_url }}">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="name" class="form-label">Name <span class="required">*</span></label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value="{{ request_form.name if request_form else (user_to_edit.name if user_to_edit else '') }}"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="username" class="form-label">Username <span class="required">*</span></label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              value="{{ request_form.username if request_form else (user_to_edit.username if user_to_edit else '') }}"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="email" class="form-label">Email <span class="required">*</span></label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              value="{{ request_form.email if request_form else (user_to_edit.email if user_to_edit else '') }}"
+              class="form-input"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="role" class="form-label">Role <span class="required">*</span></label>
+            <select name="role" id="role" class="form-input" required>
+              <option value="regular"{% if (request_form and request_form.role
+              == 'regular') or (user_to_edit and user_to_edit.role == 'regular')
+              or (form_mode == 'add' and not request_form) %} selected{% endif
+              %}>Regular <option value="admin"{% if (request_form and
+              request_form.role == 'admin') or (user_to_edit and
+              user_to_edit.role == 'admin') %} selected{% endif%}>Admin
+            </select>
+          </div>
+
+          {% if form_mode== 'add' %}
+          <div class="form-group">
+            <label for="password" class="form-label">Password <span class="required">*</span></label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              class="form-input"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="confirm_password" class="form-label"
+              >Confirm Password <span class="required">*</span></label
+            >
+            <input
+              type="password"
+              name="confirm_password"
+              id="confirm_password"
+              class="form-input"
+              autocomplete="new-password"
+              required
+            />
+          </div>
+          {% endif %}
+        </div>
+        <div class="form-actions">
+          <a href="{{ url_for('list_users') }}" class="btn btn-secondary"
+            >Cancel</a
+          >
+          <button type="submit" class="btn btn-primary">
+            {% if form_mode == 'edit' %}Save Changes{% else %}Add User{% endif %}
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+{% endblock %}
