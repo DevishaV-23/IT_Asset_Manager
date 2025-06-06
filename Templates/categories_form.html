@@ -1,0 +1,66 @@
+{% extends "base.html" %} {% block content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/category_form.css') }}"
+/>
+
+{% set title = "Add Category" if not category else "Edit Categroy" %} {% set
+form_action_url = url_for('add_category') if not asset else
+url_for('edit_category', category_id=category.id) %} {% if request_form %} {%
+set form_action_url = url_for('add_category') %} {% endif %} {% if category %}
+{% set title = "Edit Category" %} {% set form_action_url =
+url_for('edit_category', category_id=category.id) %} {% endif%}
+
+<body>
+  <main class="main-content">
+    <section class="form-section">
+      <div>
+        {% with messages = get_flashed_messages(with_categories=true) %} {% if
+        messages %}
+        <div class="mb-4">
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+      </div>
+      <h2 class="section-title">Category Details</h2>
+      <form method="POST" action="{{ form_action_url }}">
+        <div class="form-group">
+          <label for="name" class="form-label">Category Name <span class="required">*</span></label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            value="{{ request_form.name if request_form else (category.name if category else '' ) }}"
+            class="form-input"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            name="description"
+            id="description"
+            rows="3"
+            class="form-input"
+            placeholder="Enter a brief description of the category"
+          >
+            {{ request_form.description if request_form else (category.description if category else '' ) }}</textarea
+          >
+        </div>
+        <div class="form-actions">
+          <a href="{{ url_for('list_categories') }}" class="btn cancel"
+            >Cancel</a
+          >
+          <button type="submit" class="btn save">
+            {% if category %}Save Changes{% else %}Add Category{% endif %}
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+{% endblock %}
