@@ -170,6 +170,82 @@ def dashboard():
                            retired_assets=retired_assets, new_assets_this_month=new_assets_this_month, page_title=page_title, page_subtitle=page_subtitle
       )
 
+@app.route('/profile/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    page_title= "My Profile"
+    page_subtitle = "Edit your profile information"
+    user_to_edit = current_user # User can only edit their own profile
+    if request.method == 'POST':
+        new_name = request.form.get('name')
+        new_email = request.form.get('email')
+        new_username = request.form.get('username')
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_new_password = request.form.get('confirm_new_password')
+
+        # Validate name
+        if not new_name:
+            flash('Name cannot be empty.', 'danger')
+            return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form)
+        
+        user_to_edit.name = new_name
+
+        # Validate email and check uniqueness if changed
+        if new_email != user_to_edit.email:
+            if not new_email:
+                flash('Email cannot be empty.', 'danger')
+                return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form)
+            existing_email_user = User.query.filter(User.email == new_email, User.id != user_to_edit.id).first()
+            if existing_email_user:
+                flash('Email address is already registered by another user.', 'danger')
+                return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form)
+            user_to_edit.email = new_email
+
+        if new_username != user_to_edit.username:
+            if not new_username:
+                flash('Username cannot be empty.', 'danger')
+                return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form)
+            existing_username_user = User.query.filter(User.username == new_username, User.id != user_to_edit.id).first()
+            if existing_username_user:
+                flash('Username is already taken.', 'danger')
+                return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form)
+            user_to_edit.username = new_username
+
+        password_changed = False
+        if new_password: # User wants to change password
+            if not current_password:
+                flash('Current password is required to change your password.', 'danger')
+                return render_template('profile_edit_form.html', title="Edit Profile", page_title=page_title, user_to_edit=user_to_edit, request_form=request.form)
+            if not user_to_edit.check_password(current_password):
+                flash('Incorrect current password.', 'danger')
+                return render_template('profile_edit_form.html', title="Edit Profile", page_title=page_title, user_to_edit=user_to_edit, request_form=request.form)
+            if not new_password or not confirm_new_password:
+                flash('New password and confirmation are required to change password.', 'danger')
+                return render_template('profile_edit_form.html', title="Edit Profile", page_title=page_title, user_to_edit=user_to_edit, request_form=request.form)
+            if new_password != confirm_new_password:
+                flash('New passwords do not match.', 'danger')
+                return render_template('profile_edit_form.html', title="Edit Profile", page_title=page_title, user_to_edit=user_to_edit, request_form=request.form)
+            user_to_edit.set_password(new_password)
+            password_changed = True
+        
+        try:
+            db.session.commit()
+            if password_changed:
+                flash('Your profile and password have been updated successfully! Please log in again if your username changed.', 'success')
+                # If username changed, logging out might be a good idea to force re-login with new username
+                # For simplicity, we'll just flash a message here.
+            else:
+                flash('Your profile has been updated successfully!', 'success')
+            return redirect(url_for('dashboard')) 
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating profile: {str(e)}', 'danger')
+            app.logger.error(f"Error updating profile for {user_to_edit.username}: {e}")
+            return render_template('profile_edit_form.html', title="Edit Profile", page_title=page_title, user_to_edit=user_to_edit, request_form=request.form)
+        
+    return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, page_title=page_title, page_subtitle=page_subtitle)
+
 @app.route('/assets')
 @login_required
 def list_assets():
