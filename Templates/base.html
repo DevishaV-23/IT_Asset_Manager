@@ -23,7 +23,7 @@
     {% endif %}
     </div>
     <div class="profile">
-      <a href="{{ url_for('edit_profile') }}" class="user-profile">
+      <a href="{{ url_for('auth.edit_profile') }}" class="user-profile">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -56,7 +56,7 @@
           <nav class="sidebar-nav">
             <ul>
               <li class="nav-item">
-                <a href="{{ url_for('dashboard') }}" class="item-title">
+                <a href="{{ url_for('assets.dashboard') }}" class="item-title">
                   <svg
                     class="icon"
                     fill="none"
@@ -75,7 +75,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url_for('list_assets') }}" class="item-title">
+                <a href="{{ url_for('assets.list_assets') }}" class="item-title">
                   <svg
                     class="icon"
                     fill="none"
@@ -94,7 +94,7 @@
                 >
               </li>
               <li class="nav-item">
-                <a href="{{ url_for('list_categories') }}" class="item-title">
+                <a href="{{ url_for('assets.list_categories') }}" class="item-title">
                   <svg
                     class="icon"
                     xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +120,7 @@
               </li>
               {% if current_user.role == 'admin' %}
               <li class="nav-item">
-                <a href="{{ url_for('list_users') }}" class="item-title">
+                <a href="{{ url_for('admin.list_users') }}" class="item-title">
                   <svg
                     class="icon"
                     xmlns="http://www.w3.org/2000/svg"
@@ -145,7 +145,7 @@
             </ul>
           </nav>
           <div class="logout">
-            <a href="{{ url_for('logout') }}" class="logout-btn">
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">
               <svg
                 class="icon"
                 fill="none"
