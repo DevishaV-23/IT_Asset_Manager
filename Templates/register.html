@@ -19,7 +19,7 @@
           <h1 class="title"><span class="blue">IT </span>Asset Manager</h1>
           <p class="subtitle">Create your account</p>
         </div>
-        <form method="POST" action="{{ url_for('register') }}" class="form">
+        <form method="POST" action="{{ url_for('auth.register') }}" class="form">
           <div class="name">
             <label for="name" class="form-label">Name</label>
             <input
@@ -85,7 +85,7 @@
         </form>
         <p class="account">
           Already have an account?
-          <a href="{{ url_for('login') }}" class="account-link">Login here</a>
+          <a href="{{ url_for('auth.login') }}" class="account-link">Login here</a>
         </p>
       </div>
     </div>

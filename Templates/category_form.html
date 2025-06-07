@@ -8,11 +8,11 @@
   href="{{ url_for('static', filename='css/form.css') }}"
 />
 {% set title = "Add Category" if not category else "Edit Categroy" %} {% set
-form_action_url = url_for('add_category') if not asset else
-url_for('edit_category', category_id=category.id) %} {% if request_form %} {%
-set form_action_url = url_for('add_category') %} {% endif %} {% if category %}
+form_action_url = url_for('assets.add_category') if not asset else
+url_for('assets.edit_category', category_id=category.id) %} {% if request_form %} {%
+set form_action_url = url_for('assets.add_category') %} {% endif %} {% if category %}
 {% set title = "Edit Category" %} {% set form_action_url =
-url_for('edit_category', category_id=category.id) %} {% endif%}
+url_for('assets.edit_category', category_id=category.id) %} {% endif%}
 
 <body>
   <main class="main-content">
@@ -55,7 +55,7 @@ url_for('edit_category', category_id=category.id) %} {% endif%}
           >
         </div>
         <div class="form-actions">
-          <a href="{{ url_for('list_categories') }}" class="btn btn-secondary"
+          <a href="{{ url_for('assets.list_categories') }}" class="btn btn-secondary"
             >Cancel</a
           >
           <button type="submit" class="btn btn-primary">
