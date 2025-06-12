@@ -54,6 +54,7 @@
               <th scope="col" class="column-title">Location</th>
               <th scope="col" class="column-title">Purchase Date</th>
               <th scope="col" class="column-title">Created By</th>
+              <th scope="col" class="column-title">Last Updated</th>
               <th scope="col" class="column-title">Actions</th>
             </tr>
           </thead>
@@ -72,7 +73,8 @@
               </td>
               <td class="table-data">{{ asset.location if asset.location else 'N/A' }}</td>
               <td class="table-data">{{ asset.purchase_date.strftime('%Y-%m-%d') if asset.purchase_date else 'N/A' }}</td>
-              <td class = "table-data">{{ asset.creator.name if asset.creator else 'N/A' }}</td>
+              <td class ="table-data">{{ asset.creator.name if asset.creator else 'N/A' }}</td>
+              <td class="table-data">{{ asset.last_updated_on.strftime('%Y-%m-%d') if last_updated_on else 'N/A' }}</td>
               <td class="table-data">
                 <a
                   href="{{ url_for('assets.edit_asset', asset_id=asset.id) }}"
