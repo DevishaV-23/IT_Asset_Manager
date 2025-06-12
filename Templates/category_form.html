@@ -39,20 +39,19 @@ url_for('assets.edit_category', category_id=category.id) %} {% endif%}
             id="name"
             value="{{ request_form.name if request_form else (category.name if category else '' ) }}"
             class="form-input"
+            placeholder="e.g. Laptop"
             required
           />
         </div>
         <div class="form-group">
           <label for="description" class="form-label">Description</label>
+          <!-- Due to it potentially being a long answer if preserves the text just in case theres a failure with the form -->
           <textarea
             name="description"
             id="description"
             rows="3"
-            class="form-input"
-            placeholder="Enter a brief description of the category"
-          >
-            {{ request_form.description if request_form else (category.description if category else '' ) }}</textarea
-          >
+            class="form-input-long"
+            placeholder="Enter a brief description of the category">{{ request_form.description if request_form else (category.description if category else '' ) }}</textarea>
         </div>
         <div class="form-actions">
           <a href="{{ url_for('assets.list_categories') }}" class="btn btn-secondary"

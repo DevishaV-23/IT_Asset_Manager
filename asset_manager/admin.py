@@ -13,7 +13,7 @@ admin_bp = Blueprint(
 @admin_required
 def list_users():
     page_title= "User Management"
-    page_subtitle = "You can view and manage users here"
+    page_subtitle = "View and manage users"
     users = User.query.order_by(User.name).all()
     return render_template('user_list.html', title="User Management", users=users, page_title=page_title, page_subtitle=page_subtitle)
 
