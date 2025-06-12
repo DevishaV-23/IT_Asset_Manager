@@ -38,7 +38,7 @@ def dashboard():
 @login_required
 def list_assets():
     page_title= "Assets Overview"
-    page_subtitle = "You cna view and manage all your IT assets here"
+    page_subtitle = "View and Manage all your IT assets"
     assets = Asset.query.options(joinedload(Asset.creator)).all()
     return render_template('assets_list.html', title="IT Assets", assets=assets, page_title=page_title, page_subtitle=page_subtitle)
 
@@ -170,7 +170,7 @@ def delete_asset(asset_id):
 @login_required
 def list_categories():
     page_title= "Categories Overview"
-    page_subtitle = "You can view and manage asset categories here"
+    page_subtitle = "View and manage asset categories"
     categories = AssetCategory.query.all()
 
     category_counts_query = db.session.query(

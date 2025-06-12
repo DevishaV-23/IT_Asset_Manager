@@ -22,7 +22,7 @@
         </div>
         {% endif %} {% endwith %}
       </div>
-      <h2 class="section-title {% if form_mode == 'edit' %} edit {% else %} add {% endif %}">User Information</h2>
+      <h2 class="section-title {% if form_mode == 'edit' %} edit {% else %} add {% endif %}">User Details</h2>
 
       {% set form_action_url = url_for('admin.add_user') if form_mode == 'add' else
       url_for('admin.edit_user', user_id=user_to_edit.id) %} {% if form_mode == 'edit'
@@ -45,6 +45,7 @@
               id="name"
               value="{{ request_form.name if request_form else (user_to_edit.name if user_to_edit else '') }}"
               class="form-input"
+              placeholder="e.g. John D"
               required
             />
           </div>
@@ -56,6 +57,7 @@
               id="username"
               value="{{ request_form.username if request_form else (user_to_edit.username if user_to_edit else '') }}"
               class="form-input"
+              placeholder="e.g. john_d"
               required
             />
           </div>
@@ -67,6 +69,7 @@
               id="email"
               value="{{ request_form.email if request_form else (user_to_edit.email if user_to_edit else '') }}"
               class="form-input"
+              placeholder="e.g. john_d@email.com"
               required
             />
           </div>
