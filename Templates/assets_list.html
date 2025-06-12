@@ -73,8 +73,8 @@
               </td>
               <td class="table-data">{{ asset.location if asset.location else 'N/A' }}</td>
               <td class="table-data">{{ asset.purchase_date.strftime('%Y-%m-%d') if asset.purchase_date else 'N/A' }}</td>
-              <td class ="table-data">{{ asset.creator.name if asset.creator else 'N/A' }}</td>
-              <td class="table-data">{{ asset.last_updated_on.strftime('%Y-%m-%d') if last_updated_on else 'N/A' }}</td>
+              <td class="table-data">{{ asset.creator.name if asset.creator else 'N/A' }}</td>
+              <td class="table-data">{{ asset.last_updated_on.strftime('%Y-%m-%d') if asset.last_updated_on else 'N/A' }}</td>
               <td class="table-data">
                 <a
                   href="{{ url_for('assets.edit_asset', asset_id=asset.id) }}"
