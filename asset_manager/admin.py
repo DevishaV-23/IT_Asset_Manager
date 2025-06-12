@@ -14,7 +14,7 @@ admin_bp = Blueprint(
 def list_users():
     page_title= "User Management"
     page_subtitle = "View and manage users"
-    users = User.query.order_by(User.name).all()
+    users = User.query.order_by(User.id).all()
     return render_template('user_list.html', title="User Management", users=users, page_title=page_title, page_subtitle=page_subtitle)
 
 @admin_bp.route('/users/add', methods=['GET', 'POST'])
