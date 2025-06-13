@@ -224,10 +224,10 @@ def edit_category(category_id):
         description = request.form.get('description')
         if not new_name:
             flash('Category name is required.', 'danger')
-            return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('assets.edit_category', category_id=category_id), request_form=request.form)
+            return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('assets.edit_category', category_id=category_id), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
         elif new_name != category_to_edit.name and AssetCategory.query.filter_by(name=new_name).first():
             flash(f'Category name "{new_name}" already exists.', 'danger')
-            return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('assets.edit_category', category_id=category_id), request_form=request.form)
+            return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('assets.edit_category', category_id=category_id), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
         else:
             category_to_edit.name = new_name
             category_to_edit.description = description
@@ -238,7 +238,7 @@ def edit_category(category_id):
             except Exception as e:
                 db.session.rollback()
                 flash(f'Error updating category: {str(e)}', 'danger')
-                return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('assets.edit_category', category_id=category_id), request_form=request.form)
+                return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('assets.edit_category', category_id=category_id), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
     return render_template('category_form.html', title="Edit Category", category=category_to_edit, form_action_url=url_for('assets.edit_category', category_id=category_id), page_title=page_title, page_subtitle=page_subtitle)
 
     
