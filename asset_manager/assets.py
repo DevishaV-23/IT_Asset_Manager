@@ -62,7 +62,7 @@ def add_asset():
         purchase_cost_str = request.form.get('purchase_cost')
         purchase_cost = float(purchase_cost_str) if purchase_cost_str else None
         vendor = request.form.get('vendor')
-        location = request.form.get('location')
+        storage_location = request.form.get('storage_location')
         status = request.form['status']
         description = request.form.get('description')
         category_id = request.form.get('category')
@@ -86,7 +86,7 @@ def add_asset():
                 purchase_date=purchase_date,
                 purchase_cost=purchase_cost,
                 vendor=vendor,
-                storage_location=location,
+                storage_location=storage_location,
                 status=status,
                 description=description,
                 category_id=category_id,
@@ -136,7 +136,7 @@ def edit_asset(asset_id):
         purchase_cost_str = request.form.get('purchase_cost')
         asset_to_edit.purchase_cost = float(purchase_cost_str) if purchase_cost_str else None
         asset_to_edit.vendor = request.form.get('vendor')
-        asset_to_edit.location = request.form.get('location')
+        asset_to_edit.storage_location = request.form.get('storage_location')
         asset_to_edit.status = request.form['status']
         asset_to_edit.description = request.form.get('description')
         asset_to_edit.category_id = request.form.get('category')
