@@ -46,7 +46,7 @@ def add_user():
             error = True
         
         if error:
-            return render_template('user_form.html', title="Add User", page_title=page_title, form_mode='add', request_form=request.form)
+            return render_template('user_form.html', title="Add User", form_mode='add', request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
 
         new_user = User(name=name, username=username, email=email, role=role)
         new_user.set_password(password)
@@ -58,7 +58,7 @@ def add_user():
         except Exception as e:
             db.session.rollback()
             flash(f'Error creating user: {str(e)}', 'danger')
-            return render_template('user_form.html', title="Add User", page_title=page_title, form_mode='add', request_form=request.form)
+            return render_template('user_form.html', title="Add User", form_mode='add', request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
 
     return render_template('user_form.html', title="Add User", page_title=page_title, form_mode='add', page_subtitle=page_subtitle)
 
@@ -87,19 +87,19 @@ def edit_user(user_id):
         if new_username != original_username:
             if not new_username: # Check if new_username is not empty
                 flash('Username cannot be empty.', 'danger')
-                return render_template('admin/user_form.html', title="Edit User", page_title=page_title, form_mode='edit', user_to_edit=user_to_edit, request_form=request.form)
+                return render_template('admin/user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             if User.query.filter(User.username == new_username, User.id != user_id).first(): # Check uniqueness excluding self
                 flash('Username already taken.', 'danger')
-                return render_template('user_form.html', title="Edit User", page_title=page_title, form_mode='edit', user_to_edit=user_to_edit, request_form=request.form)
+                return render_template('user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             user_to_edit.username = new_username
         
         if new_email != original_email:
             if not new_email: # Check if new_email is not empty
                 flash('Email cannot be empty.', 'danger')
-                return render_template('user_form.html', title="Edit User", page_title=page_title, form_mode='edit', user_to_edit=user_to_edit, request_form=request.form)
+                return render_template('user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             if User.query.filter(User.email == new_email, User.id != user_id).first(): 
                 flash('Email already registered by another user.', 'danger')
-                return render_template('user_form.html', title="Edit User", page_title=page_title, form_mode='edit', user_to_edit=user_to_edit, request_form=request.form)
+                return render_template('user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             user_to_edit.email = new_email
             
         user_to_edit.role = request.form.get('role')
@@ -111,9 +111,9 @@ def edit_user(user_id):
         except Exception as e:
             db.session.rollback()
             flash(f'Error updating user: {str(e)}', 'danger')
-            return render_template('user_form.html', title="Edit User", page_title=page_title, form_mode='edit', user_to_edit=user_to_edit, request_form=request.form)
+            return render_template('user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
     
-    return render_template('user_form.html', title="Edit User", page_title=page_title, form_mode='edit', user_to_edit=user_to_edit, page_subtitle=page_subtitle)
+    return render_template('user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, page_title=page_title, page_subtitle=page_subtitle)
 
 
 @admin_bp.route('/users/delete/<int:user_id>', methods=['POST'])
