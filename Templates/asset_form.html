@@ -106,12 +106,12 @@
             />
           </div>
           <div class="form-group">
-            <label for="location" class="form-label">Location</label>
+            <label for="storage_location" class="form-label">Location</label>
             <input
               type="text"
-              name="location"
-              id="location"
-              value="{{ request_form.location if request_form else (asset.location if asset else '') }}"
+              name="storage_location"
+              id="storage_location"
+              value="{{ request_form.storage_location if request_form else (asset.storage_location if asset else '') }}"
               class="form-input"
               placeholder="e.g. Office, Home, etc."
             />
