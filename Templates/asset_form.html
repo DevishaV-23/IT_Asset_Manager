@@ -3,13 +3,6 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/form.css') }}"
 />
-{% set title = "Add Asset" if not asset else "Edit Asset" %} {% set
-form_action_url = url_for('assets.add_asset') if not asset else url_for('assets.edit_asset',
-asset_id=asset.id) %} {% if request_form %} {% set form_action_url =
-url_for('assets.add_asset') %} {% endif %} {% if asset %} {% set title = "Edit Asset"
-%} {% set form_action_url = url_for('assets.edit_asset', asset_id=asset.id) %} {% endif
-%}
-
 <body>
   <main class="main-content">
     <section class="form-section">
