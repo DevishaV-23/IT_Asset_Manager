@@ -142,6 +142,5 @@ body{
 }
 
 .alert {
-  width: calc(100% - 320px);
-  margin-left: 289px;
+  width: calc(100% - 38px); /* Adjust width to fit within the main content */
 }
