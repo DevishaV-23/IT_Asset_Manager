@@ -57,7 +57,7 @@ def add_asset():
             purchase_date = datetime.strptime(purchase_date_str, '%Y-%m-%d') if purchase_date_str else None
         except ValueError:
             flash('Invalid purchase date format. Please use the date picker or YYYY-MM-DD format.', 'danger')
-            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form)
+            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
         
         purchase_cost_str = request.form.get('purchase_cost')
         purchase_cost = float(purchase_cost_str) if purchase_cost_str else None
@@ -69,15 +69,15 @@ def add_asset():
 
         if not asset_name or not asset_tag or not status or not category_id:
             flash('Asset Name, Asset Tag, Status, and Category are required.', 'danger')
-            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form)
+            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
         
         elif Asset.query.filter_by(asset_tag=asset_tag).first():
             flash(f'Asset Tag {asset_tag} already exists.', 'danger')
-            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form)
+            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
         
         elif serial_number and Asset.query.filter_by(serial_number=serial_number).first():
             flash(f'Serial Number {serial_number} already exists.', 'danger')
-            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form)
+            return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)  
         else:
             new_asset = Asset(
                 asset_name=asset_name,
@@ -100,7 +100,7 @@ def add_asset():
             except Exception as e:
                 db.session.rollback()
                 flash(f'Error adding asset: {str(e)}', 'danger')
-                return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form)
+                return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
     return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
 
 @assets_bp.route('/assets/edit/<int:asset_id>', methods=['GET', 'POST'])
@@ -115,13 +115,13 @@ def edit_asset(asset_id):
         new_asset_tag = request.form['asset_tag']
         if new_asset_tag != original_asset_tag and Asset.query.filter_by(asset_tag=new_asset_tag).first():
             flash(f'Asset Tag {new_asset_tag} already exists.', 'danger')
-            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form)
+            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
         
         original_serial_number = asset_to_edit.serial_number
         new_serial_number = request.form.get('serial_number')
         if new_serial_number and new_serial_number != original_serial_number and Asset.query.filter_by(serial_number=new_serial_number).first():
             flash(f'Serial Number {new_serial_number} already exists.', 'danger')
-            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form)  
+            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)  
         
         asset_to_edit.asset_name = request.form['asset_name']
         asset_to_edit.asset_tag = new_asset_tag
@@ -131,7 +131,7 @@ def edit_asset(asset_id):
             asset_to_edit.purchase_date = datetime.strptime(purchase_date_str, '%Y-%m-%d').date() if purchase_date_str else None
         except ValueError:
             flash('Invalid purchase date. Please use the date picker or YYYY-MM-DD format.', 'danger')
-            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form)
+            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
 
         purchase_cost_str = request.form.get('purchase_cost')
         asset_to_edit.purchase_cost = float(purchase_cost_str) if purchase_cost_str else None
@@ -147,7 +147,7 @@ def edit_asset(asset_id):
         except Exception as e:
             db.session.rollback()
             flash(f'An error occurred: {str(e)}', 'danger')
-            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form)
+            return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
     return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), page_title=page_title, page_subtitle=page_subtitle)
 
 @assets_bp.route('/assets/delete/<int:asset_id>', methods=['POST'])
@@ -209,7 +209,7 @@ def add_category():
             except Exception as e:
                 db.session.rollback()
                 flash(f'An error occurred: {str(e)}', 'danger')
-                return render_template('category_form.html', title='Add Category', form_action_url=url_for('assets.add_category'), request_form=request.form)
+                return render_template('category_form.html', title='Add Category', form_action_url=url_for('assets.add_category'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
     return render_template('category_form.html', title='Add Category', form_action_url=url_for('assets.add_category'), page_title=page_title, page_subtitle=page_subtitle)
 
 @assets_bp.route('/categories/edit/<int:category_id>', methods=['GET', 'POST'])
