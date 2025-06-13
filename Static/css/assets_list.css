@@ -12,3 +12,56 @@
     background-color: #fee2e2;
     color: #991b1b;
 }
+
+/* On screens 1440px and below, switch to the responsive card grid */
+@media screen and (max-width: 1440px) {
+  /* Hide the desktop table header */
+  .main-table .table-head {
+    display: none;
+  }
+
+  /*
+    The Grid Container for our Cards
+    This is the key to the new responsive behavior.
+  */
+  .table-body {
+    display: grid;
+    gap: 24px; /* The space between the cards */
+
+    /* Auto-fit the amount of columns based on viewing size */
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+
+  /* Make the rows behave like blocks within the grid */
+  .main-table tr {
+    display: block;
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+
+  /* Style each cell for the card layout */
+  .main-table td.table-data {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    text-align: right;
+    border-bottom: 1px solid #f3f4f6;
+    white-space: normal;
+  }
+
+  .main-table tr td.table-data:last-child {
+    border-bottom: none;
+  }
+
+  /* Create the label using the data-label attribute */
+  .main-table td.table-data::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #374151;
+    text-align: left;
+    margin-right: 16px;
+  }
+}
