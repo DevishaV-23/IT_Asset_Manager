@@ -118,16 +118,16 @@ def edit_profile():
         if new_password: # User wants to change password
             if not current_password:
                 flash('Current password is required to change your password.', 'danger')
-                return render_template('profile_edit_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
+                return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             if not user_to_edit.check_password(current_password):
                 flash('Incorrect current password.', 'danger')
-                return render_template('profile_edit_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
+                return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             if not new_password or not confirm_new_password:
                 flash('New password and confirmation are required to change password.', 'danger')
-                return render_template('profile_edit_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
+                return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             if new_password != confirm_new_password:
                 flash('New passwords do not match.', 'danger')
-                return render_template('profile_edit_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
+                return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             user_to_edit.set_password(new_password)
             password_changed = True
         
@@ -143,6 +143,6 @@ def edit_profile():
         except Exception as e:
             db.session.rollback()
             flash(f'Error updating profile: {str(e)}', 'danger')
-            return render_template('profile_edit_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
+            return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
         
     return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, page_title=page_title, page_subtitle=page_subtitle)
