@@ -135,6 +135,8 @@ def edit_profile():
             db.session.commit()
             if password_changed:
                 flash('Your profile and password have been updated successfully! Please log in again if your username changed.', 'success')
+                # If username changed, logging out might be a good idea to force re-login with new username
+                # For simplicity, we'll just flash a message here.
             else:
                 flash('Your profile has been updated successfully!', 'success')
             return redirect(url_for('assets.dashboard')) 
