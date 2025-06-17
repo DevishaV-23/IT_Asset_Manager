@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user, login_user, logout_user
 from werkzeug.security import generate_password_hash
-from . import db
-from . import User
+from .extensions import db
+from .models import User
 import os
 
 auth_bp = Blueprint(
@@ -60,6 +60,7 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             next_page = request.args.get('next')
+            flash('Login successful!', 'success')
             return redirect(next_page or url_for('assets.dashboard'))
         else:
             flash('Invalid username or password.', 'danger')

@@ -3,8 +3,9 @@ from flask_login import login_required, current_user
 from sqlalchemy import func, extract
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timezone
-from . import db, admin_required
-from . import Asset, AssetCategory
+from .extensions import db
+from . import admin_required
+from .models import Asset, AssetCategory
 
 assets_bp = Blueprint(
     'assets', __name__,
