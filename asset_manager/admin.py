@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from . import db, admin_required
-from . import User, Asset
+from .extensions import db
+from . import admin_required
+from .models import User, Asset
 
 admin_bp = Blueprint(
     'admin', __name__,
