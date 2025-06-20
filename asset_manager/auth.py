@@ -4,24 +4,28 @@ from .extensions import db
 from .models import User
 import os
 
+# This creates a Blueprint named 'auth'. All routes defined in this file will be prefixed with '/auth' and can be referenced with the 'auth.' endpoint
 auth_bp = Blueprint(
     'auth', __name__,
     url_prefix='/auth'
     )
 
+# Handles both displaying the registration form (GET) and processing a new user registration (POST)
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    if current_user.is_authenticated: # If already logged in, redirect to dashboard
+    # If a user is already logged in, redirect them to the main dashboard
+    if current_user.is_authenticated:
         return redirect(url_for("assets.dashboard"))
 
     if request.method == 'POST':
+        # Form Data Retrieval
         name= request.form['name']
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
         role = request.form.get('role', 'regular') 
-        # Validate input
+        # Input Validation
         if not name or not username or not email or not password or not confirm_password:
             flash('All fields are required.', 'danger')
         elif password != confirm_password:
@@ -31,6 +35,7 @@ def register():
         elif User.query.filter_by(email=email).first():
             flash('Email address already registered.', 'danger')
         else:
+            # If validation passes, create a new User object
             new_user = User(name=name, username=username, email=email, role=role)
             new_user.set_password(password)
             try:
@@ -43,20 +48,24 @@ def register():
                 flash(f'An error occurred: {str(e)}', 'danger')
                 print(f"Error during registration: {e}")
         return render_template('register.html', title="Register", request_form=request.form)
+    # For a GET request, just display the empty registration form
     return render_template('register.html', title="Register")
 
+# Handles both displaying the login form (GET) and authenticating a user based on their form submission (POST)
 @auth_bp.route('/login', methods=['GET', 'POST'])   
 def login():
-    print("HERE", os.listdir(os.path.join(os.getcwd(), 'templates')))
+    # If a user is already logged in, redirect them to the main dashboard
     if current_user.is_authenticated:
         return redirect(url_for('assets.dashboard'))
     
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        # Find the user in the database by their username
         user = User.query.filter_by(username=username).first()
-        
+        # Check if the user exists AND if the provided password is correct
         if user and user.check_password(password):
+            # If credentials are valid, register the user with the session
             login_user(user)
             next_page = request.args.get('next')
             flash('Login successful!', 'success')
@@ -65,20 +74,25 @@ def login():
             flash('Invalid username or password.', 'danger')
     return render_template('login.html', title="Login")
 
+# Logs the current user out
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    # Remove the user's information from the session
     logout_user()
     flash('You have been logged out.', 'success')
     return redirect(url_for('auth.login'))
 
+# Handles displaying a form for a user to edit their own profile (GET) and processing the form submission (POST)
 @auth_bp.route('/profile/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     page_title= "My Profile"
     page_subtitle = "Edit your profile information"
-    user_to_edit = current_user # User can only edit their own profile
+     # A user can only edit their own profile, so we get the user from `current_user`
+    user_to_edit = current_user 
     if request.method == 'POST':
+        # Form Data Retrieval
         new_name = request.form.get('name')
         new_email = request.form.get('email')
         new_username = request.form.get('username')
@@ -86,7 +100,7 @@ def edit_profile():
         new_password = request.form.get('new_password')
         confirm_new_password = request.form.get('confirm_new_password')
 
-        # Validate name
+        # Validation Logic
         if not new_name:
             flash('Name cannot be empty.', 'danger')
             return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
@@ -115,7 +129,9 @@ def edit_profile():
             user_to_edit.username = new_username
 
         password_changed = False
-        if new_password: # User wants to change password
+        # If the 'new_password' field is filled out, the user wants to change their password
+        if new_password: 
+            # Validate all parts of the password change process
             if not current_password:
                 flash('Current password is required to change your password.', 'danger')
                 return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
@@ -128,15 +144,15 @@ def edit_profile():
             if new_password != confirm_new_password:
                 flash('New passwords do not match.', 'danger')
                 return render_template('profile_form.html', title="Edit Profile", user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
+            # If all checks pass, set the new hashed password
             user_to_edit.set_password(new_password)
             password_changed = True
         
         try:
+            # Commit all the changes (name, email, password) to the database
             db.session.commit()
             if password_changed:
                 flash('Your profile and password have been updated successfully! Please log in again if your username changed.', 'success')
-                # If username changed, logging out might be a good idea to force re-login with new username
-                # For simplicity, we'll just flash a message here.
             else:
                 flash('Your profile has been updated successfully!', 'success')
             return redirect(url_for('assets.dashboard')) 

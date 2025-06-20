@@ -2,7 +2,7 @@ from flask import session
 from asset_manager.models import User
 import pytest
 
-# Tests a user can succcesfull register
+# Tests a user can succcesful register
 def test_user_can_register(client, app):
     """Test that a new user can successfully register."""
 
