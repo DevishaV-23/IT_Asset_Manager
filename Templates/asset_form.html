@@ -1,3 +1,18 @@
+{#
+  File: templates/asset_form.html
+  Purpose:
+  This template provides a single, reusable form for both creating a new asset and
+  editing an existing one. Its behavior is controlled by the variables passed
+  from the corresponding Flask route (add_asset or edit_asset).
+
+  Key Features:
+  - Reusable for both 'Add' and 'Edit' modes.
+  - Displays validation errors and success/failure messages via flashed messages.
+  - Dynamically sets the form submission URL via the 'form_action_url' variable.
+  - Pre-populates form fields with existing data when editing an asset (using the 'asset' object).
+  - Preserves user input if a form submission fails validation (using the 'request_form' object).
+  - Dynamically changes the submit button text based on the mode ('Add Asset' or 'Save Changes').
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"
@@ -7,6 +22,11 @@
   <main class="main-content">
     <section class="form-section">
       <div>
+         {#
+          This block is responsible for displaying "flashed" messages, and is the same for every page
+          'get_flashed_messages(with_categories=true)' retrieves messages set by flash() in your Flask routes.
+          This is used to show success or error alerts to the user (e.g., "Asset added successfully!").
+        #}
         {% with messages = get_flashed_messages(with_categories=true) %} {% if
         messages %}
         <div class="mb-4">
@@ -27,6 +47,12 @@
               type="text"
               name="asset_tag"
               id="asset_tag"
+              {#
+                This value attribute handles three scenarios:
+                1. request_form: If validation fails, re-populate the field with the users previous input.
+                2. asset: If this is an 'edit' form, populate the field with the assets current data.
+                3. '': If this is a new form, leave the field blank.
+              #}
               value="{{ request_form.asset_tag if request_form else (asset.asset_tag if asset else '') }}"
               class="form-input"
               placeholder="e.g. LAP-12345"
@@ -138,6 +164,7 @@
             placeholder="Enter a brief description or notes about the asset">{{ request_form.description if request_form else (asset.description if asset else '') }}</textarea>
         </div>
         <div class="form-actions">
+          {# The 'Cancel' button always links back to the main asset list page. #}
           <a href="{{ url_for('assets.list_assets') }}" class="btn btn-secondary"
             >Cancel</a
           >

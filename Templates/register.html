@@ -1,3 +1,20 @@
+{#
+  File: templates/register.html
+  Purpose:
+  This template provides the interface for a new user to create an account.
+  It is the public-facing registration page for the application.
+
+  Key Features:
+  - Inherits from base.html, although most base features like navigation are hidden
+    for unauthenticated users.
+  - Displays flashed messages to provide feedback on validation errors (e.g.,
+    "Username already exists," "Passwords do not match.").
+  - Presents a form with fields for name, username, email, and password confirmation.
+  - The form submits data via a POST request to the `auth.register` route.
+  - Preserves user input upon form validation failure using the `request_form` object
+    to re-populate the fields.
+  - Includes a link at the bottom for existing users to navigate to the login page.
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"

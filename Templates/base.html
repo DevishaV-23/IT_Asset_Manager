@@ -1,3 +1,21 @@
+{#
+  File: templates/base.html
+  Purpose:
+  This is the main layout template for the entire application. All other templates
+  (like assets_list.html, login.html, etc.) will "extend" this file. It provides the
+  fundamental HTML structure, including the <head>, shared navigation, and a consistent
+  look and feel.
+
+  Key Features:
+  - Establishes the main HTML document structure (<html>, <head>, <body>).
+  - Dynamically sets the page <title> based on the 'title' variable passed from a route.
+  - Links to the main stylesheet for consistent styling across all pages.
+  - Contains a conditional header and sidebar navigation that only appear if a user is authenticated.
+  - The profile link in the header dynamically displays the current user's name or username.
+  - Includes an extendable 'content' block, which acts as a placeholder where child templates
+    will inject their specific content.
+  - Conditionally displays the "User Management" link in the sidebar only for admin users.
+#}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -11,6 +29,7 @@
   </head>
   <body>
     <main>
+      {# The header block is only displayed if a page_title is provided and a user is logged in. #}
       {% if page_title %} {% if current_user.is_authenticated %}
     <header>
     <div>
@@ -43,9 +62,11 @@
       {% with messages = get_flashed_messages(with_categories=true) %} {% if
       messages %} {% for category, message in messages %} {% endfor %} {% endif
       %} {% endwith %} {% block content %}{% endblock %}
+      {# This is the main content block that child templates will populate. #}
     </main>
     <nav>
       <div>
+        {# The entire sidebar navigation is only shown to authenticated users. #}
         {% if current_user.is_authenticated %}
         <aside class="sidebar">
           <div class="logo"><span class="blue">IT </span>Asset Manager</div>
@@ -114,6 +135,7 @@
                   Categories
                 </a>
               </li>
+              {# The "User Management" link is only shown to admin users. #}
               {% if current_user.role == 'admin' %}
               <li class="nav-item">
                 <a href="{{ url_for('admin.list_users') }}" class="item-title">

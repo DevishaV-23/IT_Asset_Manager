@@ -1,3 +1,20 @@
+{#
+  File: templates/dashboard.html
+  Purpose:
+  This template serves as the main landing page for authenticated users. It displays
+  a high-level overview of the asset inventory through several statistical summary boxes.
+
+  Key Features:
+  - Inherits from base.html for consistent application layout and navigation.
+  - Displays flashed messages to provide feedback on user actions (e.g., a success message after logging in).
+  - Presents key metrics in a grid layout, making data easy to read at a glance.
+  - The statistics displayed are passed directly from the `dashboard` route in `assets.py`, including:
+    - total_assets
+    - active_assets
+    - in_repair_assets
+    - retired_assets
+    - new_assets_this_month
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"

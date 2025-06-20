@@ -1,3 +1,19 @@
+{#
+  File: templates/profile_form.html
+  Purpose:
+  This template provides the interface for a logged-in user to view and edit
+  their own profile details. It handles displaying current user information
+  and submitting changes, including password updates.
+
+  Key Features:
+  - Inherits from base.html for consistent application layout.
+  - Displays flashed messages for user feedback (e.g., "Profile updated successfully!").
+  - The form submits data via a POST request to the `auth.edit_profile` route.
+  - Pre-populates all fields with the `current_user`'s data (`user_to_edit` object).
+  - Preserves user input upon form validation failure using the `request_form` object.
+  - Includes separate fields for changing a password, which are not required for a standard profile update.
+  - Displays non-editable fields like 'Role' and 'Registration Date' for informational purposes.
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"

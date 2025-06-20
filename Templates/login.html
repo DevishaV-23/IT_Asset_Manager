@@ -1,3 +1,17 @@
+{#
+  File: templates/login.html
+  Purpose:
+  This template provides the user login interface for the application. It allows
+  existing users to authenticate themselves to gain access to the system.
+
+  Key Features:
+  - Inherits from base.html for a consistent application layout.
+  - Displays flashed messages to provide feedback, such as "Registration successful!"
+    or "Invalid username or password."
+  - Presents a clean form with fields for 'username' and 'password'.
+  - The form submits data via a POST request to the `auth.login` route.
+  - Includes a link at the bottom for new users to navigate to the registration page.
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"
