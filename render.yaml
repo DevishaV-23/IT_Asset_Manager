@@ -5,8 +5,7 @@
 services:
   # 1. The PostgreSQL Database Service
   # This defines the database that your application will use.
-  - type: postgres
-    name: asset-manager-db
+  - name: asset-manager-db
     # You can uncomment and set a region if you have a preference, e.g., "frankfurt"
     # region: oregon 
 
