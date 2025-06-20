@@ -26,6 +26,21 @@ def create_app(config_override=None):
                 root_path=project_root,
                 instance_relative_config=True)
 
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-secret-key-for-dev')
+    
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        # This line ensures compatibility between different database URL formats
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+    
+    # When DATABASE_URL is not set, we fall back to SQLite in the instance folder.
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or f"sqlite:///{os.path.join(app.instance_path, 'it_asset_manager.db')}"
+    
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    if config_override:
+        app.config.update(config_override)
     
     # Set a secret key for session security (e.g., for signing cookies).
     app.config['SECRET_KEY'] = os.urandom(24)
