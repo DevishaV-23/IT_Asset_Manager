@@ -14,6 +14,10 @@ pip install -r requirements.txt
 echo "Running database migrations..."
 python -m flask db upgrade
 
+# 3. Seed the database with initial data (this solves the no-shell problem)
+echo "Seeding the database..."
+python -c "from asset_manager import create_app; from seed import seed_database; app = create_app(); app.app_context().push(); seed_database()"
+
 # Start the Gunicorn server. We use 'python -m gunicorn' for the same reason.
 echo "Starting Gunicorn server..."
 python -m gunicorn app:app
