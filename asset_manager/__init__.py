@@ -20,11 +20,6 @@ def admin_required(f):
 
 # This function is responsible for creating and configuring the Flask application instance.
 def create_app(config_override=None):
-
-    if os.environ.get('RENDER') is None:
-        from dotenv import load_dotenv
-        load_dotenv()
-
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     
     app = Flask(__name__,
