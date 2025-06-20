@@ -5,6 +5,7 @@ from flask_login import current_user
 from . import models
 from .extensions import db, login_manager, migrate
 
+# A custom decorator that restricts access to a route to admin users only
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -15,30 +16,42 @@ def admin_required(f):
             return redirect(url_for('assets.dashboard'))
         return f(*args, **kwargs)
     return decorated_function
-    
+
+# This function is responsible for creating and configuring the Flask application instance.
 def create_app(config_override=None):
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     app = Flask(__name__,
                 template_folder=os.path.join(base_dir, 'templates'), 
                 static_folder=os.path.join(base_dir, 'static') 
                 )
+    
+    # Set a secret key for session security (e.g., for signing cookies).
     app.config['SECRET_KEY'] = os.urandom(24)
+    # Configure the database connection (using SQLite in this case).
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///it_asset_manager.db'
+    # Disable a Flask-SQLAlchemy feature that is not needed and can be noisy.
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     if config_override:
         app.config.update(config_override)
 
+    # Connect the SQLAlchemy database object to the app.
     db.init_app(app)
+    # Connect the Flask-Migrate extension for database migrations.
     migrate.init_app(app, db)
+    # Connect the Flask-Login extension for user session management.
     login_manager.init_app(app, db)
+    # Tell Flask-Login where to redirect users if they try to access a protected page without being logged in.
     login_manager.login_view = 'auth.login'
 
+    # This function tells Flask-Login how to load a user from the database given the user ID that is stored in the session cookie.
     @login_manager.user_loader
     def load_user(user_id):
          return db.session.get(models.User, int(user_id))
-
+    
+    # The 'with app.app_context()' block makes the application instance available for operations like blueprint registration and database creation.
     with app.app_context():
+        # Blueprints are collections of routes from other files. This connects them
         from . import auth
         app.register_blueprint(auth.auth_bp)
 
@@ -48,7 +61,7 @@ def create_app(config_override=None):
         from . import admin
         app.register_blueprint(admin.admin_bp)
 
-        db.create_all()  # Create database tables if they don't exist
+        db.create_all()  
 
         @app.route('/')
         def index():
