@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
 from sqlalchemy import func, extract
 from sqlalchemy.orm import joinedload
@@ -35,7 +35,7 @@ def dashboard():
                            retired_assets=retired_assets, new_assets_this_month=new_assets_this_month, page_title=page_title, page_subtitle=page_subtitle
       )
 
-@assets_bp.route('/assets')
+@assets_bp.route('/list')
 @login_required
 def list_assets():
     page_title= "Assets Overview"
@@ -43,7 +43,7 @@ def list_assets():
     assets = Asset.query.options(joinedload(Asset.creator)).all()
     return render_template('assets_list.html', title="IT Assets", assets=assets, page_title=page_title, page_subtitle=page_subtitle)
 
-@assets_bp.route('/assets/add', methods=['GET', 'POST'])
+@assets_bp.route('/add', methods=['GET', 'POST'])
 @login_required
 def add_asset():
     page_title= "Add an Asset"
@@ -104,12 +104,14 @@ def add_asset():
                 return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
     return render_template('asset_form.html', title='Add Asset', categories=categories, form_action_url=url_for('assets.add_asset'), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
 
-@assets_bp.route('/assets/edit/<int:asset_id>', methods=['GET', 'POST'])
+@assets_bp.route('/edit/<int:asset_id>', methods=['GET', 'POST'])
 @login_required
 def edit_asset(asset_id):
     page_title= "Edit an Asset"
     page_subtitle = "Edit an exisiting asset"
-    asset_to_edit = Asset.query.get_or_404(asset_id)
+    asset_to_edit = db.session.get(Asset, asset_id)
+    if asset_to_edit is None:
+        abort(404)
     categories = AssetCategory.query.all()
     if request.method =='POST':
         original_asset_tag = asset_to_edit.asset_tag
@@ -151,13 +153,15 @@ def edit_asset(asset_id):
             return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
     return render_template('asset_form.html', title='Edit Asset', asset=asset_to_edit, categories=categories, form_action_url=url_for('assets.edit_asset', asset_id=asset_id), page_title=page_title, page_subtitle=page_subtitle)
 
-@assets_bp.route('/assets/delete/<int:asset_id>', methods=['POST'])
+@assets_bp.route('/delete/<int:asset_id>', methods=['POST'])
 @login_required
 def delete_asset(asset_id):
     if current_user.role != 'admin':
         flash('You do not have permission to delete assets.', 'danger')
         return redirect(url_for('assets.list_assets'))
-    asset_to_delete = Asset.query.get_or_404(asset_id)
+    asset_to_delete = db.session.get(Asset, asset_id)
+    if asset_to_delete is None:
+        abort(404)
     try:
         db.session.delete(asset_to_delete)
         db.session.commit()
@@ -219,7 +223,9 @@ def add_category():
 def edit_category(category_id):
     page_title= "Edit a Category"
     page_subtitle = "Edit an existing asset category"
-    category_to_edit = AssetCategory.query.get_or_404(category_id)
+    category_to_edit = db.session.get(AssetCategory, category_id)
+    if category_to_edit is None:
+        abort(404)
     if request.method == 'POST':
         new_name = request.form['name']
         description = request.form.get('description')
@@ -247,7 +253,9 @@ def edit_category(category_id):
 @login_required
 @admin_required
 def delete_category(category_id):
-    category_to_delete = AssetCategory.query.get_or_404(category_id)
+    category_to_delete = db.session.get(AssetCategory, category_id)
+    if category_to_delete is None:
+        abort(404)
     if Asset.query.filter_by(category_id=category_id).first():
         flash('Cannot delete category, it is currently associated with one or more assets', 'danger')
         return redirect(url_for('assets.list_categories'))

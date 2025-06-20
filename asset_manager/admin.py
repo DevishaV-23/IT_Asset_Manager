@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import login_required, current_user
 from .extensions import db
 from . import admin_required
@@ -70,7 +70,9 @@ def add_user():
 def edit_user(user_id):
     page_title= "Edit a User"
     page_subtitle = "Edit user information"
-    user_to_edit = User.query.get_or_404(user_id)
+    user_to_edit = db.session.get(User, user_id)
+    if user_to_edit is None:
+        abort(404)
     if request.method == 'POST':
         if user_to_edit.id == current_user.id and user_to_edit.role == 'admin' and \
            User.query.filter_by(role='admin').count() == 1 and \
@@ -82,13 +84,17 @@ def edit_user(user_id):
         new_username = request.form.get('username')
         original_email = user_to_edit.email
         new_email = request.form.get('email')
-
+        
         user_to_edit.name = request.form.get('name')
+
+        if not user_to_edit.name:
+            flash('Name cannot be empty.', 'danger')
+            return render_template('user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
         
         if new_username != original_username:
             if not new_username: # Check if new_username is not empty
                 flash('Username cannot be empty.', 'danger')
-                return render_template('admin/user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
+                return render_template('user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
             if User.query.filter(User.username == new_username, User.id != user_id).first(): # Check uniqueness excluding self
                 flash('Username already taken.', 'danger')
                 return render_template('user_form.html', title="Edit User", form_mode='edit', user_to_edit=user_to_edit, request_form=request.form, page_title=page_title, page_subtitle=page_subtitle)
@@ -125,8 +131,9 @@ def delete_user(user_id):
         flash('You cannot delete your own account.', 'danger')
         return redirect(url_for('admin.list_users'))
 
-    user_to_delete = User.query.get_or_404(user_id)
-    
+    user_to_delete = db.session.get(User, user_id)
+    if user_to_delete is None:
+        abort(404)
     # Prevent deletion of the last admin
     if user_to_delete.role == 'admin' and User.query.filter_by(role='admin').count() <= 1:
         flash('Cannot delete the last administrator.', 'danger')

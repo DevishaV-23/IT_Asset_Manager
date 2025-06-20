@@ -50,5 +50,10 @@ def create_app(config_override=None):
 
         db.create_all()  # Create database tables if they don't exist
 
-        return app
+        @app.route('/')
+        def index():
+            """Redirects the root URL to the login page."""
+            return redirect(url_for('auth.login'))
+
+    return app
     
