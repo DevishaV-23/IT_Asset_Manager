@@ -19,10 +19,26 @@ def admin_required(f):
 
 # This function is responsible for creating and configuring the Flask application instance.
 def create_app(config_override=None):
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+   # --- START DEBUGGING ---
+    print("--- DEBUGGING PATHS in create_app ---")
+    current_file_path = os.path.abspath(__file__)
+    print(f"Current file (__file__) absolute path: {current_file_path}")
+    
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    print(f"Calculated project_root: {project_root}")
+    # --- END DEBUGGING ---
+    
     app = Flask(__name__,
-                root_path=base_dir,
+                root_path=project_root,
                 instance_relative_config=True)
+
+    # --- START DEBUGGING ---
+    print(f"Flask app.root_path is set to: {app.root_path}")
+    print(f"Flask app.template_folder is: {app.template_folder}")
+    absolute_template_path = os.path.join(app.root_path, app.template_folder)
+    print(f"Resulting absolute template folder path: {absolute_template_path}")
+    print(f"Does the template folder exist? {os.path.isdir(absolute_template_path)}")
+    print("--- END DEBUGGING ---")
     
     # Set a secret key for session security (e.g., for signing cookies).
     app.config['SECRET_KEY'] = os.urandom(24)
