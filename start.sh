@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # start.sh
-# Final startup script that forces the DATABASE_URL into each command's environment.
+# Final version: Explicitly disable dotenv loading for the Flask CLI.
 
 # Exit immediately if a command exits with a non-zero status.
 set -e
@@ -9,15 +9,18 @@ set -e
 echo "Installing dependencies..."
 pip install -r requirements.txt
 
-# 2. Run database migrations, ensuring it sees the correct database.
+# 2. Set FLASK_APP for the script's context. This is best practice.
+export FLASK_APP=app.py
+
+# 3. Run database migrations, telling Flask NOT to load any .env files.
 echo "Running database migrations..."
-DATABASE_URL=$DATABASE_URL python -m flask db upgrade
+python -m flask --no-load-dotenv db upgrade
 
-# 3. Seed the database, ensuring it sees the correct database.
+# 4. Seed the database, also telling Flask NOT to load any .env files.
 echo "Seeding the database..."
-DATABASE_URL=$DATABASE_URL python -m flask seed
+python -m flask --no-load-dotenv seed
 
-# 4. Start the Gunicorn server, ensuring it sees the correct database.
+# 5. Start the Gunicorn server.
 echo "Starting Gunicorn server..."
-gunicorn "app:app" --env DATABASE_URL="$DATABASE_URL"
-```
+# Gunicorn does not use the Flask CLI, so it correctly inherits the environment.
+gunicorn app:app
