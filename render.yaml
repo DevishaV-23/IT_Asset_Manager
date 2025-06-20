@@ -7,18 +7,19 @@
 # This dedicated block is the standard way to define a database.
 databases:
   - name: asset-manager-db
-    region: oregon # Recommended to set a region for better performance
 
 # 2. The Web Service
 # The 'services' block is for non-database services like our Flask app.
 services:
   - type: web
     name: it-asset-manager
-    region: oregon # Must match the database region
     env: python
-    branch: 67-deploy-the-application
+    # IMPORTANT: Change 'main' to the name of the branch you are deploying from.
+    branch: main # <-- CHANGE THIS LINE to your branch name
     buildCommand: "pip install -r requirements.txt && flask db upgrade"
     startCommand: "gunicorn 'asset_manager:create_app()'"
+    # The 'healthCheckPath' helps Render know if your app has started successfully.
+    healthCheckPath: /
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
