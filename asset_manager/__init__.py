@@ -1,10 +1,12 @@
 import os
+import click
 from flask import Flask, redirect, url_for, flash, request
 from functools import wraps
 from flask_login import current_user
 from . import models
 from .extensions import db, login_manager, migrate
 from dotenv import load_dotenv
+from ..seed import seed_database
 
 
 # A custom decorator that restricts access to a route to admin users only
@@ -71,6 +73,12 @@ def create_app(config_override=None):
     def load_user(user_id):
          return db.session.get(models.User, int(user_id))
     
+    @app.cli.command("seed")
+    def seed_command():
+        """Seeds the database with initial data."""
+        seed_database()
+        click.echo("Database seeded successfully.")
+
     # The 'with app.app_context()' block makes the application instance available for operations like blueprint registration and database creation.
     with app.app_context():
         # Blueprints are collections of routes from other files. This connects them
