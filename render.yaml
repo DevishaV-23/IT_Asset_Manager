@@ -28,4 +28,5 @@ services:
         # This securely gets the URL from the database defined above.
         fromDatabase:
           name: asset-manager-db # This MUST match the database name above.
-          property: internalUrl
+          # The 'connectionString' property provides the full URL the application needs.
+          property: connectionString
