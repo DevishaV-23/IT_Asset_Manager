@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
 # start.sh
-# Final version: Explicitly disable dotenv loading for the Flask CLI.
+# Final version: Calls executables directly from the virtual environment.
 
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# 1. Install dependencies
+# 1. Install dependencies. This creates the .venv folder.
 echo "Installing dependencies..."
 pip install -r requirements.txt
 
 # 2. Set FLASK_APP for the script's context. This is best practice.
 export FLASK_APP=app.py
 
-# 3. Run database migrations, telling Flask NOT to load any .env files.
+# 3. Run database migrations by calling the 'flask' executable directly.
+# This ensures we use the one that was just installed.
 echo "Running database migrations..."
-python -m flask --no-load-dotenv db upgrade
+./.venv/bin/flask db upgrade
 
-# 4. Seed the database, also telling Flask NOT to load any .env files.
+# 4. Seed the database by calling the 'flask' executable directly.
 echo "Seeding the database..."
-python -m flask --no-load-dotenv seed
+./.venv/bin/flask seed
 
-# 5. Start the Gunicorn server.
+# 5. Start the Gunicorn server by calling its executable directly.
 echo "Starting Gunicorn server..."
-# Gunicorn does not use the Flask CLI, so it correctly inherits the environment.
-gunicorn app:app
+./.venv/bin/gunicorn app:app
