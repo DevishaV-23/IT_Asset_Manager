@@ -5,9 +5,6 @@ from functools import wraps
 from flask_login import current_user
 from . import models
 from .extensions import db, login_manager, migrate
-from dotenv import load_dotenv
-from seed import seed_database
-
 
 # A custom decorator that restricts access to a route to admin users only
 def admin_required(f):
@@ -25,6 +22,7 @@ def admin_required(f):
 def create_app(config_override=None):
 
     if os.environ.get('RENDER') is None:
+        from dotenv import load_dotenv
         load_dotenv()
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -76,6 +74,7 @@ def create_app(config_override=None):
     @app.cli.command("seed")
     def seed_command():
         """Seeds the database with initial data."""
+        from seed import seed_database
         seed_database()
         click.echo("Database seeded successfully.")
 
