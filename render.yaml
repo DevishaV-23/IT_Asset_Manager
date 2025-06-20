@@ -1,35 +1,31 @@
 # render.yaml
-# Blueprint for deploying the IT Asset Manager application on Render.
-# This version includes an automatic database migration step.
+# Definitive blueprint for deploying the IT Asset Manager on Render.
+# This version uses the correct, separate 'databases' and 'services' blocks
+# as per the official Render documentation.
 
+# 1. The PostgreSQL Database
+# This dedicated block is the standard way to define a database.
+databases:
+  - name: asset-manager-db
+    region: oregon # Recommended to set a region for better performance
+
+# 2. The Web Service
+# The 'services' block is for non-database services like our Flask app.
 services:
-  # 1. The PostgreSQL Database Service
-  # This defines the database that your application will use.
-  - type: postgres
-    name: asset-manager-db
-    # You can uncomment and set a region if you have a preference, e.g., "frankfurt"
-    # region: oregon 
-
-  # 2. The Flask Web Service
-  # This defines your main application.
   - type: web
     name: it-asset-manager
-    env: python # Specifies the environment
-    # Ensure this matches the branch you are deploying from (e.g., main or master)
+    region: oregon # Must match the database region
+    env: python
     branch: 67-deploy-the-application
-    # Build and Start commands for the web service
     buildCommand: "pip install -r requirements.txt && flask db upgrade"
     startCommand: "gunicorn 'asset_manager:create_app()'"
-    # Defines the environment variables needed by your Flask application
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: SECRET_KEY
-        # This tells Render to automatically generate a secure, random secret key for you.
         generateValue: true
       - key: DATABASE_URL
-        # This securely gets the internal URL from the database service defined above.
-        # It ensures your web service can talk to your database.
+        # This securely gets the URL from the database defined above.
         fromDatabase:
-          name: asset-manager-db # This name MUST exactly match the psql service name above.
+          name: asset-manager-db # This MUST match the database name above.
           property: internalUrl
