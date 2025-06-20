@@ -21,9 +21,8 @@ def admin_required(f):
 def create_app(config_override=None):
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     app = Flask(__name__,
-                template_folder=os.path.join(base_dir, 'templates'), 
-                static_folder=os.path.join(base_dir, 'static') 
-                )
+                root_path=base_dir,
+                instance_relative_config=True)
     
     # Set a secret key for session security (e.g., for signing cookies).
     app.config['SECRET_KEY'] = os.urandom(24)
