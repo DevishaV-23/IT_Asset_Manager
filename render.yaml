@@ -13,6 +13,7 @@ databases:
 services:
   - type: web
     name: it-asset-manager
+    plan: free
     env: python
     # IMPORTANT: Change 'main' to the name of the branch you are deploying from.
     branch: main # <-- CHANGE THIS LINE to your branch name
