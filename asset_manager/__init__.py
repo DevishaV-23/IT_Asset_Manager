@@ -6,7 +6,7 @@ from flask_login import current_user
 from . import models
 from .extensions import db, login_manager, migrate
 from dotenv import load_dotenv
-from ..seed import seed_database
+from seed import seed_database
 
 
 # A custom decorator that restricts access to a route to admin users only
