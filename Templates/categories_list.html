@@ -1,3 +1,19 @@
+{#
+  File: templates/categories_list.html
+  Purpose:
+  This template displays all asset categories in a grid layout. It provides a
+  high-level overview of the different types of assets being managed.
+
+  Key Features:
+  - Inherits from base.html for a consistent application layout.
+  - Displays flashed messages for feedback on actions like adding, editing, or deleting a category.
+  - Conditionally displays an "Add New Category" button only to admin users.
+  - Iterates through the `categories` object passed from the Flask route.
+  - For each category, it displays its name, description, and the total count of assets
+    assigned to it (`category.asset_count`).
+  - Conditionally displays "Edit" and "Delete" action icons for each category,
+    which are visible only to admin users.
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"

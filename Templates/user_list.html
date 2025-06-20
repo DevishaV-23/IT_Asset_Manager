@@ -1,3 +1,22 @@
+{#
+  File: templates/user_list.html
+  Purpose:
+  This template provides the main User Management interface for administrators.
+  It displays a list of all registered users in a table, providing key details
+  and actions that can be performed by an admin.
+
+  Key Features:
+  - Inherits from base.html for a consistent application layout.
+  - Displays flashed messages for user feedback after actions like adding, editing, or deleting a user.
+  - Includes an "Add New User" button that links to the user creation form.
+  - Iterates through the `users` object passed from the Flask route to populate the table.
+  - Displays key user details: ID, Name, Username, Email, Role, and Registration Date.
+  - The user's role is highlighted with a specific CSS class for easy identification.
+  - Provides an "Edit" link for each user, directing the admin to the edit form.
+  - Conditionally displays a "Delete" button for each user, which is hidden for the currently
+    logged-in admin to prevent self-deletion.
+  - Includes a JavaScript confirmation dialog (`onsubmit`) for the delete action to prevent accidental deletions.
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"

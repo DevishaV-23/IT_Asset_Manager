@@ -1,3 +1,19 @@
+{#
+  File: templates/user_form.html
+  Purpose:
+  This template provides a single, reusable form for both creating a new user and
+  editing an existing one from the admin panel. Its behavior is controlled by the
+  `form_mode` variable passed from the Flask route.
+
+  Key Features:
+  - Inherits from base.html for consistent layout and navigation.
+  - Displays flashed messages for user feedback (e.g., "User added successfully!").
+  - Dynamically sets the form submission URL based on whether the `form_mode` is 'add' or 'edit'.
+  - Conditionally displays password input fields only when adding a new user (`form_mode == 'add'`).
+  - Pre-populates form fields with existing data when editing a user.
+  - Preserves user input if a form submission fails validation.
+  - Dynamically changes the submit button text based on the mode.
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"
@@ -23,10 +39,12 @@
         {% endif %} {% endwith %}
       </div>
       <h2 class="section-title {% if form_mode == 'edit' %} edit {% else %} add {% endif %}">User Details</h2>
-
+      {# Set the form submission URL dynamically based on the mode. #}
       {% set form_action_url = url_for('admin.add_user') if form_mode == 'add' else
       url_for('admin.edit_user', user_id=user_to_edit.id) %} {% if form_mode == 'edit'
       and user_to_edit %}
+
+      {# Display extra info only when editing an existing user. #}
       <p class="info">
         User password changes are handled by the user via their profile page or
         password reset functionality.
@@ -73,6 +91,7 @@
               required
             />
           </div>
+          <!-- Role Dropdown -->
           <div class="form-group">
             <label for="role" class="form-label">Role <span class="required">*</span></label>
             <select name="role" id="role" class="form-input" required>
@@ -84,7 +103,7 @@
               user_to_edit.role == 'admin') %} selected{% endif%}>Admin
             </select>
           </div>
-
+          <!-- Conditionally display password fields only when adding a new user. -->
           {% if form_mode== 'add' %}
           <div class="form-group">
             <label for="password" class="form-label">Password <span class="required">*</span></label>

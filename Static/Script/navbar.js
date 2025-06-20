@@ -2,7 +2,7 @@
 // Get current path
   const currentPath = window.location.pathname;
 
-  // Get all nav links
+  // Get all the nav links
   const navLinks = document.querySelectorAll('.item-title');
 
   navLinks.forEach(link => {

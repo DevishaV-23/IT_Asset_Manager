@@ -1,3 +1,19 @@
+{#
+  File: templates/assets_list.html
+  Purpose:
+  This template displays a comprehensive list of all assets in a table format.
+  It serves as the main overview page for viewing and managing assets.
+
+  Key Features:
+  - Inherits from the base.html for consistent layout and navigation.
+  - Displays flashed messages to provide feedback on actions (e.g., success, error).
+  - Includes an "Add New Asset" button that links to the asset creation form.
+  - Iterates through the `assets` object passed from the Flask route to populate the table rows.
+  - Shows key details for each asset: Name, Tag, Category, Status, Location, Creator, and Last Updated date.
+  - Provides an "Edit" link for each asset, directing the user to the edit form.
+  - Conditionally displays a "Delete" button for each asset, visible only if the `current_user` has the 'admin' role.
+  - Uses a form for the delete action to ensure it is performed via a secure POST request.
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"

@@ -1,3 +1,19 @@
+{#
+  File: templates/category_form.html
+  Purpose:
+  This template provides a single, reusable form for both creating a new asset
+  category and editing an existing one. It's an admin-only feature.
+
+  Key Features:
+  - Inherits from base.html for a consistent layout and navigation.
+  - Displays flashed messages for user feedback (e.g., "Category added successfully!").
+  - Dynamically sets the page title and form submission URL based on whether
+    a 'category' object is passed to the template.
+  - Preserves user input if a form submission fails validation by re-populating
+    the fields from the `request_form` object.
+  - Pre-fills form fields with existing data when in 'edit' mode.
+  - Changes the submit button text to "Add Category" or "Save Changes" depending on the mode.
+#}
 {% extends "base.html" %} {% block content %}
 <link
   rel="stylesheet"
@@ -7,8 +23,14 @@
   rel="stylesheet"
   href="{{ url_for('static', filename='css/form.css') }}"
 />
-{% set title = "Add Category" if not category else "Edit Categroy" %} {% set
-form_action_url = url_for('assets.add_category') if not asset else
+{#
+  This logic block sets the 'title' and 'form_action_url' variables for the template.
+  - If a 'category' object exists, it's an "Edit" form.
+  - Otherwise, it's an "Add" form.
+  This makes the form reusable for both creating and updating categories.
+#}
+{% set title = "Add Category" if not category else "Edit Categroy" %} 
+{% set form_action_url = url_for('assets.add_category') if not asset else
 url_for('assets.edit_category', category_id=category.id) %} {% if request_form %} {%
 set form_action_url = url_for('assets.add_category') %} {% endif %} {% if category %}
 {% set title = "Edit Category" %} {% set form_action_url =
@@ -37,6 +59,12 @@ url_for('assets.edit_category', category_id=category.id) %} {% endif%}
             type="text"
             name="name"
             id="name"
+            {#
+              This 'value' attribute handles three scenarios:
+              1. 'request_form': If validation fails, re-populate the field with the user's previous input.
+              2. 'category': If this is an 'edit' form, populate the field with the category's current name.
+              3. '': If this is a new form, leave the field blank.
+            #}
             value="{{ request_form.name if request_form else (category.name if category else '' ) }}"
             class="form-input"
             placeholder="e.g. Laptop"
@@ -45,7 +73,7 @@ url_for('assets.edit_category', category_id=category.id) %} {% endif%}
         </div>
         <div class="form-group">
           <label for="description" class="form-label">Description</label>
-          <!-- Due to it potentially being a long answer if preserves the text just in case theres a failure with the form -->
+          <!-- Due to it potentially being a long answer it preserves the text just in case theres a failure with the form -->
           <textarea
             name="description"
             id="description"
