@@ -4,6 +4,8 @@ from functools import wraps
 from flask_login import current_user
 from . import models
 from .extensions import db, login_manager, migrate
+from dotenv import load_dotenv
+
 
 # A custom decorator that restricts access to a route to admin users only
 def admin_required(f):
@@ -19,6 +21,9 @@ def admin_required(f):
 
 # This function is responsible for creating and configuring the Flask application instance.
 def create_app(config_override=None):
+
+    if os.environ.get('RENDER') is None:
+        load_dotenv()
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     
