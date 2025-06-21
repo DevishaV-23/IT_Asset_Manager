@@ -41,16 +41,6 @@ def create_app(config_override=None):
 
     if config_override:
         app.config.update(config_override)
-    
-    # Set a secret key for session security (e.g., for signing cookies).
-    app.config['SECRET_KEY'] = os.urandom(24)
-    # Configure the database connection (using SQLite in this case).
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///it_asset_manager.db'
-    # Disable a Flask-SQLAlchemy feature that is not needed and can be noisy.
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    if config_override:
-        app.config.update(config_override)
 
     # Connect the SQLAlchemy database object to the app.
     db.init_app(app)
