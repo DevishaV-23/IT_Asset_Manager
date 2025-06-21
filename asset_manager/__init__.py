@@ -1,4 +1,5 @@
 import os
+import click
 from flask import Flask, redirect, url_for, flash, request
 from functools import wraps
 from flask_login import current_user
@@ -19,19 +20,23 @@ def admin_required(f):
 
 # This function is responsible for creating and configuring the Flask application instance.
 def create_app(config_override=None):
-
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     
     app = Flask(__name__,
                 root_path=project_root,
                 instance_relative_config=True)
 
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-secret-key-for-dev')
     
-    # Set a secret key for session security (e.g., for signing cookies).
-    app.config['SECRET_KEY'] = os.urandom(24)
-    # Configure the database connection (using SQLite in this case).
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///it_asset_manager.db'
-    # Disable a Flask-SQLAlchemy feature that is not needed and can be noisy.
+    database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        # This line ensures compatibility between different database URL formats
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+    
+    # When DATABASE_URL is not set, we fall back to SQLite in the instance folder.
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or f"sqlite:///{os.path.join(app.instance_path, 'it_asset_manager.db')}"
+    
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     if config_override:
@@ -51,6 +56,13 @@ def create_app(config_override=None):
     def load_user(user_id):
          return db.session.get(models.User, int(user_id))
     
+    @app.cli.command("seed")
+    def seed_command():
+        """Seeds the database with initial data."""
+        from seed import seed_database
+        seed_database()
+        click.echo("Database seeded successfully.")
+
     # The 'with app.app_context()' block makes the application instance available for operations like blueprint registration and database creation.
     with app.app_context():
         # Blueprints are collections of routes from other files. This connects them
@@ -62,8 +74,7 @@ def create_app(config_override=None):
 
         from . import admin
         app.register_blueprint(admin.admin_bp)
-
-        db.create_all()  
+ 
 
         @app.route('/')
         def index():

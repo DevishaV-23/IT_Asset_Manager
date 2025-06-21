@@ -1,0 +1,33 @@
+# render.yaml
+# Definitive blueprint for deploying the IT Asset Manager on Render.
+# This version uses the correct, separate 'databases' and 'services' blocks
+# as per the official Render documentation.
+
+# 1. The PostgreSQL Database
+# This dedicated block is the standard way to define a database.
+databases:
+  - name: asset-manager-db
+
+# 2. The Web Service
+# The 'services' block is for non-database services like our Flask app.
+services:
+  - type: web
+    name: it-asset-manager
+    plan: free
+    env: python
+    branch: main 
+    buildCommand: "chmod +x start.sh"
+    startCommand: "./start.sh"
+    # The 'healthCheckPath' helps Render know if your app has started successfully.
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        # This securely gets the URL from the database defined above.
+        fromDatabase:
+          name: asset-manager-db # This MUST match the database name above.
+          # The 'connectionString' property provides the full URL the application needs.
+          property: connectionString
