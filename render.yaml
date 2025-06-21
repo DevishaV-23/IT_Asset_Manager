@@ -15,8 +15,7 @@ services:
     name: it-asset-manager
     plan: free
     env: python
-    # IMPORTANT: Change 'main' to the name of the branch you are deploying from.
-    branch: 67-deploy-the-application # <-- CHANGE THIS LINE to your branch name
+    branch: main 
     buildCommand: "chmod +x start.sh"
     startCommand: "./start.sh"
     # The 'healthCheckPath' helps Render know if your app has started successfully.

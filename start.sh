@@ -1,34 +1,27 @@
 #!/usr/bin/env bash
-# A more verbose start.sh for debugging
+# start.sh
+# Final production version.
 
-# This makes the script exit on any error
+# Exit immediately if a command exits with a non-zero status.
 set -e
-# This prints each command to the log before it is executed
-set -x
 
+# 1. Install dependencies
 echo "Installing dependencies..."
 pip install -r requirements.txt
 
+# 2. Set FLASK_APP for the script's context
 export FLASK_APP=app.py
 
-# --- NEW DEBUGGING STEPS ---
-echo "--- Checking database state before migration ---"
-
-# The '|| true' part ensures that the script won't exit if these commands fail
-# (which they will if the database is brand new and empty).
-./.venv/bin/flask db current || true
-# --- End Debugging ---
-
+# 3. Run database migrations
+# This will apply any new migrations you add in the future.
 echo "Running database migrations..."
 ./.venv/bin/flask db upgrade
 
-echo "--- Checking database state AFTER migration ---"
-./.venv/bin/flask db current || true
-echo "--- End Debugging ---"
-
+# 4. Seed the database
+# This is safe to run every time, as it's designed to not re-create data.
 echo "Seeding the database..."
 ./.venv/bin/flask seed
 
+# 5. Start the Gunicorn server
 echo "Starting Gunicorn server..."
-set +x # Turn off command printing before starting the server
 ./.venv/bin/gunicorn app:app
