@@ -1,0 +1,22 @@
+# .github/workflows/deploy.yml
+
+name: Deploy to Render Production
+
+# This workflow runs on every push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: Production
+      url: https://it-asset-manager-tosd.onrender.com
+
+    steps:
+      - name: Trigger Render Deployment
+        # This step uses 'curl' to send a request to your secret deploy hook URL
+        run: curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
