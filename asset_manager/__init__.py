@@ -20,22 +20,25 @@ def admin_required(f):
 
 # This function is responsible for creating and configuring the Flask application instance.
 def create_app(config_override=None):
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    rootdir = os.path.abspath(os.path.join(basedir, '..'))
+
     app = Flask(__name__,
-                root_path=project_root,
+                root_path=rootdir,
                 instance_relative_config=True)
 
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-secret-key-for-dev')
     
     database_url = os.environ.get('DATABASE_URL')
+
     if database_url:
-        # This line ensures compatibility between different database URL formats
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql://", 1)
-    
-    # When DATABASE_URL is not set, we fall back to SQLite in the instance folder.
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url or f"sqlite:///{os.path.join(app.instance_path, 'it_asset_manager.db')}"
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        # This is the ONLY line that should set the SQLite path
+        local_db_path = os.path.join(rootdir, 'it_asset_manager.db')
+        app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{local_db_path}"
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
