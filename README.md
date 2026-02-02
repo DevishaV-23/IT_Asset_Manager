@@ -71,7 +71,7 @@ venv\Scripts\Activate.ps1
 
 #Install all required packages from requirements.txt.
 
-pip install -r requirements.txt
+pip -m pip install -r requirements.txt
 
 4. Set Up the Database
 
@@ -87,7 +87,7 @@ $env:FLASK_APP = "app.py"
 flask db upgrade
 
 # (Optional) Seed the database with sample data
-python seed.py
+flask seed
 
 Note: The seed.py script will create an initial admin user, default categories, and 10+ sample users and assets.
 
