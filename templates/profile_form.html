@@ -36,10 +36,8 @@
       </div>
       <h2 class="section-title">Your Details</h2>
 
-      <form
-        method="POST"
-        action="{{ url_for('auth.edit_profile') }}"
-      >
+      <form method="POST" action="{{ url_for('auth.edit_profile') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-grid">
           <div class="form-group">
             <label for="name" class="form-label">Name <span class="required">*</span></label>
