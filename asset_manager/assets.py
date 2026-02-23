@@ -124,6 +124,11 @@ def edit_asset(asset_id):
     asset_to_edit = db.session.get(Asset, asset_id)
     if asset_to_edit is None:
         abort(404)
+
+    if asset_to_edit.created_by_user_id != current_user.id and current_user.role != 'admin':
+        flash('You do not have permission to edit this asset.', 'danger')
+        return redirect(url_for('assets.list_assets'))
+
     categories = AssetCategory.query.all()
     if request.method =='POST':
         # Validation logic

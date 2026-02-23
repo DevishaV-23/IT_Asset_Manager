@@ -4,7 +4,7 @@ from flask import Flask, redirect, url_for, flash, request
 from functools import wraps
 from flask_login import current_user
 from . import models
-from .extensions import db, login_manager, migrate
+from .extensions import db, login_manager, migrate, csrf
 
 # A custom decorator that restricts access to a route to admin users only
 def admin_required(f):
@@ -53,6 +53,9 @@ def create_app(config_override=None):
     login_manager.init_app(app, db)
     # Tell Flask-Login where to redirect users if they try to access a protected page without being logged in.
     login_manager.login_view = 'auth.login'
+    # Connect the Flask-WTF extension for CSRF protection
+    csrf.init_app(app)
+
 
     # This function tells Flask-Login how to load a user from the database given the user ID that is stored in the session cookie.
     @login_manager.user_loader

@@ -53,6 +53,7 @@ url_for('assets.edit_category', category_id=category.id) %} {% endif%}
       </div>
       <h2 class="section-title">Category Details</h2>
       <form method="POST" action="{{ form_action_url }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
           <label for="name" class="form-label">Category Name <span class="required">*</span></label>
           <input

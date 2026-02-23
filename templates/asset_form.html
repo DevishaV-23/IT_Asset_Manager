@@ -40,6 +40,7 @@
       </div>
       <h2 class="section-title">Asset Details</h2>
       <form method="POST" action="{{ form_action_url }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-grid">
           <div class="form-group">
             <label for="asset_tag" class="form-label">Asset Tag <span class="required">*</span></label>

@@ -34,6 +34,7 @@
           <p class="subtitle">Login to your account</p>
         </div>
         <form method="POST" action="{{ url_for('auth.login') }}" class="form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="username">
             <label for="username" class="form-label">Username</label>
             <input

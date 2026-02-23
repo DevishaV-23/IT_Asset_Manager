@@ -103,6 +103,7 @@
             method="POST"
             onsubmit="return confirm('Are you sure you want to delete this category? This may affect existing assets if not handled properly.');"
           >
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button type="submit" class="delete">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

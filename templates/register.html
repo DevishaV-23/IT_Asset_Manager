@@ -37,6 +37,7 @@
           <p class="subtitle">Create your account</p>
         </div>
         <form method="POST" action="{{ url_for('auth.register') }}" class="form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="name">
             <label for="name" class="form-label">Name</label>
             <input

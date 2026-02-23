@@ -54,6 +54,7 @@
       </p>
       {% endif %}
       <form method="POST" action="{{ form_action_url }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-grid">
           <div class="form-group">
             <label for="name" class="form-label">Name <span class="required">*</span></label>
