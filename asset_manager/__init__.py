@@ -4,7 +4,7 @@ from flask import Flask, redirect, url_for, flash, request
 from functools import wraps
 from flask_login import current_user
 from . import models
-from .extensions import db, login_manager, migrate, csrf
+from .extensions import db, login_manager, migrate, csrf, talisman
 
 # A custom decorator that restricts access to a route to admin users only
 def admin_required(f):
@@ -55,7 +55,12 @@ def create_app(config_override=None):
     login_manager.login_view = 'auth.login'
     # Connect the Flask-WTF extension for CSRF protection
     csrf.init_app(app)
-
+    # Enable Talisman with a relaxed Content Security Policy (CSP) initially.
+    # We set content_security_policy=None to ensure your existing CSS/JS doesn't break.
+    talisman.init_app(
+        app,
+        content_security_policy=None,
+    )
 
     # This function tells Flask-Login how to load a user from the database given the user ID that is stored in the session cookie.
     @login_manager.user_loader
