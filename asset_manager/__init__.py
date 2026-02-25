@@ -45,6 +45,16 @@ def create_app(config_override=None):
     if config_override:
         app.config.update(config_override)
 
+    # Security: Session and Cookie protection
+    app.config.update(
+        SESSION_COOKIE_SECURE=True,      # Enforced because Render provides HTTPS
+        SESSION_COOKIE_HTTPONLY=True,    # Protects against XSS session theft
+        SESSION_COOKIE_SAMESITE="Lax",   # Standard protection against CSRF
+        REMEMBER_COOKIE_SECURE=True,     # Applies security to "Remember Me" features
+        REMEMBER_COOKIE_HTTPONLY=True,
+        REMEMBER_COOKIE_SAMESITE="Lax"
+    )
+    
     # Connect the SQLAlchemy database object to the app.
     db.init_app(app)
     # Connect the Flask-Migrate extension for database migrations.
