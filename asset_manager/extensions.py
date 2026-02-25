@@ -2,9 +2,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_wtf import CSRFProtect
+from flask_talisman import Talisman
 
 # Initialize extensions here to avoid circular imports
 db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
 csrf = CSRFProtect()
+talisman = Talisman()
