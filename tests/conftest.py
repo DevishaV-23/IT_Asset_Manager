@@ -1,6 +1,6 @@
 import pytest
 from asset_manager import create_app
-from asset_manager.extensions import db
+from asset_manager.extensions import db,talisman
 from asset_manager.models import User, AssetCategory
 
 @pytest.fixture
@@ -14,10 +14,16 @@ def app():
         'WTF_CSRF_ENABLED': False,
         'PRESERVE_CONTEXT_ON_EXCEPTION': False,
         'SECRET_KEY': 'test-key',
+        'SESSION_COOKIE_SECURE': True,
+        'SESSION_COOKIE_HTTPONLY': True,
+        'SESSION_COOKIE_SAMESITE': 'Lax'
     })
 
     app.config['TALISMAN_ENABLED'] = False
-    app.config['SESSION_COOKIE_SECURE'] = False
+
+
+    if not hasattr(app, 'talisman'):
+        talisman.init_app(app, content_security_policy=None)
 
     with app.app_context():
         db.create_all()
@@ -31,7 +37,6 @@ def app():
             db.session.add_all([admin_user, regular_user, test_cat])
             db.session.commit()
         yield app
-
         db.session.remove()
         db.drop_all()
 

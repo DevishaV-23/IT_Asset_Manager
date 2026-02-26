@@ -62,11 +62,9 @@ def create_app(config_override=None):
         # Enable Talisman HTTPS/HSTS/CSP
         talisman.init_app(app, content_security_policy=None)
     else:
-        # Testing Environment: Keep it simple so Pytest can log in
-        app.config.update(
-            SESSION_COOKIE_SECURE=False,
-            WTF_CSRF_ENABLED=False
-        )
+        # Testing Environment: Only disable security if NOT explicitly requested by the test
+        app.config.setdefault('SESSION_COOKIE_SECURE', False)
+        app.config.setdefault('WTF_CSRF_ENABLED', False)
 
     # Connect the SQLAlchemy database object to the app.
     db.init_app(app)
