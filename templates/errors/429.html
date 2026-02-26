@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="text-align: center; margin-top: 50px;">
+    <h1>429 - Too Many Requests</h1>
+    <p>Sorry, you have made too many requests in a short period of time.</p>
+    <a href="{{ url_for('assets.dashboard') }}">Return to Dashboard</a>
+</div>
+{% endblock %}

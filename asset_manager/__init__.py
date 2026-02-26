@@ -1,6 +1,6 @@
 import os
 import click
-from flask import Flask, redirect, url_for, flash, request, render_template
+from flask import Flask, app, redirect, url_for, flash, request, render_template
 from functools import wraps
 from flask_login import current_user
 from . import models
@@ -27,11 +27,13 @@ def create_app(config_override=None):
     app = Flask(__name__,
                 root_path=rootdir,
                 instance_relative_config=True)
-
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-secret-key-for-dev')
     
-    database_url = os.environ.get('DATABASE_URL')
+    if config_override: 
+        app.config.update(config_override)
+    else:
+        app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-secret-key-for-dev')
 
+    database_url = os.environ.get('DATABASE_URL')
     if database_url:
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql://", 1)
@@ -43,21 +45,28 @@ def create_app(config_override=None):
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    if config_override:
-        app.config.update(config_override)
-
-    # Security: Session and Cookie protection
-    app.config.update(
-        SESSION_COOKIE_SECURE=True,      # Enforced because Render provides HTTPS
-        SESSION_COOKIE_HTTPONLY=True,    # Protects against XSS session theft
-        SESSION_COOKIE_SAMESITE="Lax",   # Standard protection against CSRF
-        REMEMBER_COOKIE_SECURE=True,     # Applies security to "Remember Me" features
-        REMEMBER_COOKIE_HTTPONLY=True,
-        REMEMBER_COOKIE_SAMESITE="Lax"
-    )
-
-    # This tells Flask to trust the Render load balancer for the real user IP
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+    # For production environments, we want to enforce secure cookies and HTTPS. For testing, we disable these features to allow the test client to function properly.
+    if not app.config.get('TESTING'):
+        # Production-Grade Security for Render
+        app.config.update(
+            SESSION_COOKIE_SECURE=True,
+            SESSION_COOKIE_HTTPONLY=True,
+            SESSION_COOKIE_SAMESITE="Lax",
+            REMEMBER_COOKIE_SECURE=True,
+            REMEMBER_COOKIE_HTTPONLY=True,
+            REMEMBER_COOKIE_SAMESITE="Lax"
+        )
+        # Trust Render's Load Balancer
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+        
+        # Enable Talisman HTTPS/HSTS/CSP
+        talisman.init_app(app, content_security_policy=None)
+    else:
+        # Testing Environment: Keep it simple so Pytest can log in
+        app.config.update(
+            SESSION_COOKIE_SECURE=False,
+            WTF_CSRF_ENABLED=False
+        )
 
     # Connect the SQLAlchemy database object to the app.
     db.init_app(app)
@@ -69,9 +78,6 @@ def create_app(config_override=None):
     login_manager.login_view = 'auth.login'
     # Connect the Flask-WTF extension for CSRF protection
     csrf.init_app(app)
-    # Enable Talisman with a relaxed Content Security Policy (CSP) initially.
-    # We set content_security_policy=None to ensure your existing CSS/JS doesn't break.
-    talisman.init_app(app, content_security_policy=None,)
     # Connect the Limiter to the app
     limiter.init_app(app)
 

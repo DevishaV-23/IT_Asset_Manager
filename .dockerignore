@@ -1,8 +1,8 @@
+.venv
+venv
 __pycache__
-*.pyc
-.env
-.git
 instance/
+.git
+.env
+*.db
 tests/
-venv/
-it_asset_manager.db
