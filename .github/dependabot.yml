@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "pip" # For your Python requirements.txt
+    directory: "/"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    # This ensures it tracks your specific security needs
+    groups:
+      dependencies:
+        patterns:
+          - "*"
