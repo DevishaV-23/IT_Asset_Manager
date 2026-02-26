@@ -1,10 +1,11 @@
 import os
 import click
-from flask import Flask, redirect, url_for, flash, request
+from flask import Flask, redirect, url_for, flash, request, render_template
 from functools import wraps
 from flask_login import current_user
 from . import models
-from .extensions import db, login_manager, migrate, csrf, talisman
+from .extensions import db, login_manager, migrate, csrf, talisman, limiter
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # A custom decorator that restricts access to a route to admin users only
 def admin_required(f):
@@ -54,7 +55,10 @@ def create_app(config_override=None):
         REMEMBER_COOKIE_HTTPONLY=True,
         REMEMBER_COOKIE_SAMESITE="Lax"
     )
-    
+
+    # This tells Flask to trust the Render load balancer for the real user IP
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+
     # Connect the SQLAlchemy database object to the app.
     db.init_app(app)
     # Connect the Flask-Migrate extension for database migrations.
@@ -67,10 +71,9 @@ def create_app(config_override=None):
     csrf.init_app(app)
     # Enable Talisman with a relaxed Content Security Policy (CSP) initially.
     # We set content_security_policy=None to ensure your existing CSS/JS doesn't break.
-    talisman.init_app(
-        app,
-        content_security_policy=None,
-    )
+    talisman.init_app(app, content_security_policy=None,)
+    # Connect the Limiter to the app
+    limiter.init_app(app)
 
     # This function tells Flask-Login how to load a user from the database given the user ID that is stored in the session cookie.
     @login_manager.user_loader
@@ -101,6 +104,14 @@ def create_app(config_override=None):
         def index():
             """Redirects the root URL to the login page."""
             return redirect(url_for('auth.login'))
+        
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return render_template('errors/429.html'), 429
+
+    @app.errorhandler(404)
+    def page_not_found(e):
+        return render_template('errors/404.html'), 404
 
     return app
     
