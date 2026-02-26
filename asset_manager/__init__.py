@@ -62,9 +62,25 @@ def create_app(config_override=None):
         # Enable Talisman HTTPS/HSTS/CSP
         talisman.init_app(app, content_security_policy=None)
     else:
-        # Testing Environment: Only disable security if NOT explicitly requested by the test
-        app.config.setdefault('SESSION_COOKIE_SECURE', False)
-        app.config.setdefault('WTF_CSRF_ENABLED', False)
+        # Testing Environment logic
+        # Check if we specifically requested 'Security Mode' 
+        is_security_test = config_override.get('SECURITY_TEST_MODE', False) if config_override else False
+        
+        if is_security_test:
+            app.config.update(
+                SESSION_COOKIE_SECURE=True,
+                SESSION_COOKIE_HTTPONLY=True,
+                WTF_CSRF_ENABLED=True
+            )
+            talisman.init_app(app, content_security_policy=None)
+        else:
+            # Standard functional tests (Admin, Assets, etc.)
+            app.config.update(
+                SESSION_COOKIE_SECURE=False,
+                SESSION_COOKIE_HTTPONLY=False,
+                WTF_CSRF_ENABLED=False
+            )
+            # Talisman is NOT initialised here for regular tests
 
     # Connect the SQLAlchemy database object to the app.
     db.init_app(app)

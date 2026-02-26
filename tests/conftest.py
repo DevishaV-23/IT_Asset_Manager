@@ -1,29 +1,30 @@
 import pytest
 from asset_manager import create_app
-from asset_manager.extensions import db,talisman
+from asset_manager.extensions import db
 from asset_manager.models import User, AssetCategory
+
 
 @pytest.fixture
 # Create a new app instance for the entire test module
 # Sets up the app with a test configuration and an in-memory SQLite database.
-def app():
+def app(request):
     """Create and configure a new app instance for the entire test module."""
-    app = create_app({
+
+    # Check if the test is marked with @pytest.mark.security_on
+    is_security_test = request.node.get_closest_marker("security_on")
+
+    config_dict = {
         'TESTING': True,
         'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
-        'WTF_CSRF_ENABLED': False,
-        'PRESERVE_CONTEXT_ON_EXCEPTION': False,
         'SECRET_KEY': 'test-key',
-        'SESSION_COOKIE_SECURE': True,
-        'SESSION_COOKIE_HTTPONLY': True,
-        'SESSION_COOKIE_SAMESITE': 'Lax'
-    })
+    }
 
-    app.config['TALISMAN_ENABLED'] = False
+    if is_security_test:
+        config_dict['SECURITY_TEST_MODE'] = True
 
-
-    if not hasattr(app, 'talisman'):
-        talisman.init_app(app, content_security_policy=None)
+    app = create_app(config_dict)
+    
+  
 
     with app.app_context():
         db.create_all()

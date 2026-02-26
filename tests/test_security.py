@@ -1,7 +1,11 @@
 
+import pytest
+
+
+@pytest.mark.security_on
 def test_security_headers(client):
     """Test that Talisman is injecting security headers in Production mode."""
-    # We simulate a non-testing environment check if possible, 
+    # Simulate a non-testing environment check if possible, 
     # or verify that the app is configured to use Talisman.
     response = client.get('/')
     # If Talisman is active, it sets these by default:
@@ -18,6 +22,7 @@ def test_rate_limiting_on_login(app, client):
     # we verify the configuration exists.
     assert app.config.get('RATELIMIT_ENABLED', True) is True
 
+@pytest.mark.security_on
 def test_session_cookie_properties(app):
     """Test that session cookies are flagged as Secure and HttpOnly."""
     # We are testing if our security configuration is present in the app config
