@@ -1,4 +1,4 @@
-# Use the same Python version as your render.yaml
+# Use the same Python version as render.yaml
 FROM python:3.11.9-slim
 
 # Set the working directory in the container

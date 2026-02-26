@@ -3,18 +3,28 @@ from asset_manager import create_app
 from asset_manager.extensions import db
 from asset_manager.models import User, AssetCategory
 
+
 @pytest.fixture
 # Create a new app instance for the entire test module
 # Sets up the app with a test configuration and an in-memory SQLite database.
-def app():
+def app(request):
     """Create and configure a new app instance for the entire test module."""
-    app = create_app({
+
+    # Check if the test is marked with @pytest.mark.security_on
+    is_security_test = request.node.get_closest_marker("security_on")
+
+    config_dict = {
         'TESTING': True,
         'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
-        'WTF_CSRF_ENABLED': False,
-        'LOGIN_DISABLED': False,
-        'SERVER_NAME': 'localhost'
-    })
+        'SECRET_KEY': 'test-key',
+    }
+
+    if is_security_test:
+        config_dict['SECURITY_TEST_MODE'] = True
+
+    app = create_app(config_dict)
+    
+  
 
     with app.app_context():
         db.create_all()
@@ -27,7 +37,10 @@ def app():
             test_cat = AssetCategory(name="Test Laptops", description="Category for testing")
             db.session.add_all([admin_user, regular_user, test_cat])
             db.session.commit()
-    yield app
+        yield app
+        db.session.remove()
+        db.drop_all()
+
 
 @pytest.fixture()
 # Create a test client for the app
