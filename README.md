@@ -4,7 +4,7 @@
 
 This project is a full-stack web application designed to provide a robust platform for tracking and managing IT equipment and resources. Built with Python and the Flask framework, it serves as a centralised inventory system where assets can be cataloged, monitored, and managed throughout their lifecycle.
 
-The application was developed following modern Agile and software engineering principles, resulting in a modular, maintainable, and scalable application. Key professional practices demonstrated include a structured project architecture using Flask Blueprints, version control via Git/GitHub, database schema management with Flask-Migrate, automated testing with Pytest, Continuous Integration (CI) with GitHub Actions, and deployment to a live web server.
+The application was developed following modern Agile and software engineering principles, resulting in a modular, maintainable, and scalable application. Key professional practices demonstrated include a structured project architecture using Flask Blueprints, version control via Git/GitHub, database schema management with Flask-Migrate, automated testing with Pytest, Continuous Integration (CI) with GitHub Actions, deployment to a live web server and containerised deployment via Docker.
 
 ## Live Application
 
@@ -17,6 +17,11 @@ The application is deployed on Render and can be accessed here: (https://it-asse
     * **Regular User:** Can view all assets and categories, create and edit assets, and fully manage their own profile.
 
 * **Interactive Dashboard:** A dynamic landing page for logged-in users that provides a real-time statistical overview of the asset inventory, including total assets, counts by status (Active, In Repair, Retired), new assets added this month.
+
+* **Security:**
+    * **Security Headers:** Implemented via Flask-Talisman to enforce HTTPS, XSS protection, and HSTS.
+    * **Rate Limiting:** Protects login endpoints from brute-force attacks using Flask-Limiter.
+    * **Secure Cookies** Cookies are flagged as Secure, HttpOnly, and SameSite=Lax.
 
 * **Full CRUD Functionality:**
     * **Assets:** Users can manage a detailed inventory of IT assets, with each asset linked to a category and the user who created it for clear accountability.
@@ -31,7 +36,7 @@ The application is deployed on Render and can be accessed here: (https://it-asse
     * **Architecture:** Application Factory pattern with Flask Blueprints to separate concerns (`auth`, `assets`, `admin`).
     * **Database:** SQLAlchemy (ORM) with a SQLite backend.
     * **Authentication:** Flask-Login for secure session management.
-    * **Security:** Passwords are fully hashed using Werkzeug.
+    * **Security:** Flask-Talisman, Flask-Limiter, and Werkzeug password hashing.
 
 * **Frontend:**
     * **Structure:** HTML5 with Jinja2 Templating.
@@ -43,6 +48,7 @@ The application is deployed on Render and can be accessed here: (https://it-asse
     * **Automated Testing:** A comprehensive test suite using `pytest` covers models, authentication, and application routes.
     * **Continuous Integration (CI):** A GitHub Actions pipeline automatically runs the full test suite, and deploys the application on every push and pull request to the `main` branch, ensuring code quality and preventing regressions.
     * **Deployment:** The application is deployed to a live production environment on **Render**.
+    * **Containerisation:** Fully Dockerised for environment parity between development and production.
 
 ## Setup and Installation
 
@@ -52,8 +58,23 @@ Follow these steps to set up and run the project locally.
 * Python 3.8+
 * Git
 
-### 1. Clone the Repository
+### Run with Docker (Recommended)
+
+1. Run with Docker
+
+# Build the image
+docker build -t it-asset-manager .
+
+# Run the container
+docker run -p 5000:5000 -e SECRET_KEY=your_test_key it-asset-manager
+
+The app will be available at http://localhost:5000
+
+
+### 1. Manual Setup
 ```bash
+
+# A note on manula setup, due to implementing flask-talisman, and protecting the web-server, this method may not display the app locally, the best way to view this app is through the deployed url link or docker
 git clone https://github.com/DevishaV-23/IT_Asset_Manager.git
 
 2. Create and Activate a Virtual Environment
@@ -71,7 +92,7 @@ venv\Scripts\Activate.ps1
 
 #Install all required packages from requirements.txt.
 
-pip -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 
 4. Set Up the Database
 
@@ -91,10 +112,7 @@ flask seed
 
 Note: The seed.py script will create an initial admin user, default categories, and 10+ sample users and assets.
 
-5. Run the Application
-python app.py
-
-The application will be available at http://127.0.0.1:5000.
+Run: python app.py
 
 Usage
 # Admin Account: An administrator account is created by the seeding script.
