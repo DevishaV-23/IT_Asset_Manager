@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user, login_user, logout_user
-from .extensions import db
+from .extensions import db, limiter 
 from .models import User
-import os
+import logging
 
 # This creates a Blueprint named 'auth'. All routes defined in this file will be prefixed with '/auth' and can be referenced with the 'auth.' endpoint
 auth_bp = Blueprint(
@@ -52,7 +52,9 @@ def register():
     return render_template('register.html', title="Register")
 
 # Handles both displaying the login form (GET) and authenticating a user based on their form submission (POST)
-@auth_bp.route('/login', methods=['GET', 'POST'])   
+@auth_bp.route('/login', methods=['GET', 'POST'])
+# Rate-limit to prevent brute-force attacks
+@limiter.limit("5 per minute")    
 def login():
     # If a user is already logged in, redirect them to the main dashboard
     if current_user.is_authenticated:
@@ -72,6 +74,11 @@ def login():
             return redirect(next_page or url_for('assets.dashboard'))
         else:
             flash('Invalid username or password.', 'danger')
+        # Log failed login attempts for monitoring and security purposes
+        if not user or not user.check_password(password):
+            logging.warning(f"Failed login attempt for username: {username}")
+            flash('Invalid username or password')
+
     return render_template('login.html', title="Login")
 
 # Logs the current user out
