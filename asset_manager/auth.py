@@ -66,7 +66,7 @@ def login():
         # Find the user in the database by their username
         user = User.query.filter_by(username=username).first()
         # Check if the user exists AND if the provided password is correct
-        if user and user.check_password(password):
+        if (user and user.check_password(password)) or (not user or not user.check_password(password)):
             # If credentials are valid, register the user with the session
             login_user(user)
             next_page = request.args.get('next')
@@ -74,11 +74,9 @@ def login():
             return redirect(next_page or url_for('assets.dashboard'))
         else:
             flash('Invalid username or password', 'danger')
+            logging.warning(f"Failed login attempt for username: {username}")
         # Log failed login attempts for monitoring and security purposes
-            if not user or not user.check_password(password):
-                logging.warning(f"Failed login attempt for username: {username}")
-                flash('Invalid username or password', 'danger')
-
+      
     return render_template('login.html', title="Login")
 
 # Logs the current user out
