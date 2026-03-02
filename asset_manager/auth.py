@@ -73,11 +73,11 @@ def login():
             flash('Login successful!', 'success')
             return redirect(next_page or url_for('assets.dashboard'))
         else:
-            flash('Invalid username or password.', 'danger')
+            flash('Invalid username or password', 'danger')
         # Log failed login attempts for monitoring and security purposes
         if not user or not user.check_password(password):
             logging.warning(f"Failed login attempt for username: {username}")
-            flash('Invalid username or password')
+            flash('Invalid username or password', 'danger')
 
     return render_template('login.html', title="Login")
 
