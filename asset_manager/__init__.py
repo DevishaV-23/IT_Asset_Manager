@@ -31,6 +31,7 @@ def create_app(config_override=None):
     if config_override: 
         app.config.update(config_override)
     else:
+        app.config['RATELIMIT_HEADERS_ENABLED'] = True
         app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-secret-key-for-dev')
 
     database_url = os.environ.get('DATABASE_URL')
