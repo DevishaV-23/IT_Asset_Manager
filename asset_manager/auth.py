@@ -75,9 +75,9 @@ def login():
         else:
             flash('Invalid username or password', 'danger')
         # Log failed login attempts for monitoring and security purposes
-        if not user or not user.check_password(password):
-            logging.warning(f"Failed login attempt for username: {username}")
-            flash('Invalid username or password', 'danger')
+            if not user or not user.check_password(password):
+                logging.warning(f"Failed login attempt for username: {username}")
+                flash('Invalid username or password', 'danger')
 
     return render_template('login.html', title="Login")
 
