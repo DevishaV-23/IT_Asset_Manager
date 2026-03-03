@@ -6,7 +6,6 @@ from flask_login import current_user
 from . import models
 from .extensions import db, login_manager, migrate, csrf, talisman, limiter
 from werkzeug.middleware.proxy_fix import ProxyFix
-from flask_limiter import RateLimitExceeded
 
 # A custom decorator that restricts access to a route to admin users only
 def admin_required(f):
@@ -127,10 +126,9 @@ def create_app(config_override=None):
             """Redirects the root URL to the login page."""
             return redirect(url_for('auth.login'))
         
-    @app.errorhandler(RateLimitExceeded)
+    @app.errorhandler(429)
     def ratelimit_handler(e):
-        app.logger.warning(f"Rate limit exceeded: {e}")
-        return "<h1>Rate Limit Exceeded</h1><p>Please wait a moment.</p>", 429
+        return render_template('errors/429.html'), 429
     
 
     @app.errorhandler(404)
