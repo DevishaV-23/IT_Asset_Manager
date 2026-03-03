@@ -65,17 +65,16 @@ def login():
         password = request.form['password']
         # Find the user in the database by their username
         user = User.query.filter_by(username=username).first()
-        if not user or not user.check_password(password):
+        if user and user.check_password(password):
+            login_user(user)
+            flash('Login successful!', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('assets.dashboard'))
+        else:
             logging.warning(f"Failed login attempt for username: {username}")
             flash('Invalid username or password', 'danger')
-        else:
-        # Check if the user exists AND if the provided password is correct
-            if user and user.check_password(password):
-            # If credentials are valid, register the user with the session
-                login_user(user)
-                next_page = request.args.get('next')
-                flash('Login successful!', 'success')
-                return redirect(next_page or url_for('assets.dashboard'))
+
+    return redirect(next_page or url_for('assets.dashboard'))
        
 
     return render_template('login.html', title="Login")
