@@ -128,7 +128,11 @@ def create_app(config_override=None):
         
     @app.errorhandler(429)
     def ratelimit_handler(e):
-        return render_template('errors/429.html'), 429
+        try:
+            return render_template('errors/429.html'), 429
+        except Exception as err:
+            # If the template fails, this provides a backup so you don't get a blank page
+            return f"<h1>429 - Too Many Requests</h1><p>Please wait a moment. (Debug: {str(err)})</p>", 429
 
     @app.errorhandler(404)
     def page_not_found(e):
