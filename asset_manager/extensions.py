@@ -14,4 +14,11 @@ login_manager = LoginManager()
 migrate = Migrate()
 csrf = CSRFProtect()
 talisman = Talisman()
-limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"], storage_uri=os.environ.get("REDIS_URL", "memory://"), strategy="fixed-window")
+limiter = Limiter(
+    key_func=get_remote_address, 
+    default_limits=["200 per day", "50 per hour"], 
+    storage_uri=os.environ.get("REDIS_URL", "memory://"), 
+    strategy="fixed-window",
+    on_breach=None,
+    swallow_errors=False
+    )
