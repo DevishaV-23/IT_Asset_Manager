@@ -74,10 +74,9 @@ def login():
             logging.warning(f"Failed login attempt for username: {username}")
             flash('Invalid username or password', 'danger')
 
-    return redirect(next_page or url_for('assets.dashboard'))
+        return redirect(next_page or url_for('assets.dashboard'))
        
-
-    return render_template('login.html', title="Login")
+    return render_template('login.html', title="Login") 
 
 # Logs the current user out
 @auth_bp.route('/logout')
