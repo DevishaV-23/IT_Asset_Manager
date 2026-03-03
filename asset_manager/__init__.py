@@ -129,7 +129,8 @@ def create_app(config_override=None):
         
     @app.errorhandler(RateLimitExceeded)
     def ratelimit_handler(e):
-        return render_template('errors/429.html'), 429
+        app.logger.warning(f"Rate limit exceeded: {e}")
+        return "<h1>Rate Limit Exceeded</h1><p>Please wait a moment.</p>", 429
     
 
     @app.errorhandler(404)
