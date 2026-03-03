@@ -76,10 +76,7 @@ def login():
                 next_page = request.args.get('next')
                 flash('Login successful!', 'success')
                 return redirect(next_page or url_for('assets.dashboard'))
-            else:
-                flash('Invalid username or password', 'danger')
-                # Log failed login attempts for monitoring and security purposes
-        
+       
 
     return render_template('login.html', title="Login")
 
