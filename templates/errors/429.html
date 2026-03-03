@@ -1,14 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center" style="margin-top: 100px;">
+<div class="container d-flex flex-column justify-content-center align-items-center" style="height: 100vh; width: 100%;">
+    <div class="row justify-content-center w-100">
         <div class="col-md-8 text-center">
-            <h1 class="display-4">429 - Too Many Requests</h1>
-            <hr>
+            <h1 class="display-4 font-weight-bold" style="color: #333;">429 - Too Many Requests</h1>
+            <hr style="width: 50%; margin: 20px auto;">
             <p class="lead">Sorry, you have made too many requests in a short period of time.</p>
             <p>Please wait a minute before trying again.</p>
-            <a href="{{ url_for('assets.dashboard') }}" class="btn btn-primary mt-3">Return to Dashboard</a>
+            <a href="{{ url_for('assets.dashboard') }}" class="btn btn-primary btn-lg mt-4">
+                Return to Dashboard
+            </a>
         </div>
     </div>
 </div>
