@@ -78,13 +78,16 @@ def login():
 
         if user and user.check_password(password):
             session['login_attempts'] = 0 # Success: Reset
+            session.pop('last_attempt_time', None)
             login_user(user)
             return redirect(url_for('assets.dashboard'))
         else:
             # Failure: Increment
             session['login_attempts'] = attempts + 1
+            session['last_attempt_time'] = time.time()
+            session.modified = True # Forces Flask to save the session
             
-            # 3. Check if this specific failure was the 3rd one
+            # Check if this specific failure was the 3rd one
             if session['login_attempts'] >= 3:
                 return render_template('errors/429.html'), 429
                 
