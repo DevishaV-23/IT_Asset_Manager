@@ -1,17 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container d-flex flex-column justify-content-center align-items-center" style="height: 100vh; width: 100%;">
-    <div class="row justify-content-center w-100">
-        <div class="col-md-8 text-center">
-            <h1 class="display-4 font-weight-bold" style="color: #333;">429 - Too Many Requests</h1>
-            <hr style="width: 50%; margin: 20px auto;">
-            <p class="lead">Sorry, you have made too many requests in a short period of time.</p>
-            <p>Please wait a minute before trying again.</p>
-            <a href="{{ url_for('assets.dashboard') }}" class="btn btn-primary btn-lg mt-4">
-                Return to Dashboard
-            </a>
-        </div>
+<div style="
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    width: 100%; 
+    height: 100vh; 
+    text-align: center;
+">
+    <div style="max-width: 600px; padding: 20px;">
+        <h1 style="font-size: 3rem; margin-bottom: 10px;">429</h1>
+        <h2 style="margin-bottom: 20px;">Too Many Requests</h2>
+        <hr style="width: 50%; border: 1px solid #ccc; margin: 0 auto 20px auto;">
+        <p>Sorry, you have made too many requests in a short period of time.</p>
+        <p style="margin-bottom: 30px;">Please wait a minute before trying again.</p>
+        <a href="{{ url_for('assets.dashboard') }}" 
+           style="
+                display: inline-block; 
+                padding: 10px 25px; 
+                background-color: #94a3b8; 
+                color: white; 
+                text-decoration: none; 
+                border-radius: 8px;
+                font-weight: bold;
+           ">
+            Return to Dashboard
+        </a>
     </div>
 </div>
 {% endblock %}
