@@ -59,31 +59,33 @@ def login():
         return redirect(url_for('assets.dashboard'))
     
     # Initialize session variables if not present
-    if 'login_attempts' not in session:
+    if request.method == 'GET' and 'login_attempts' not in session:
         session['login_attempts'] = 0
 
     if request.method == 'POST':
-        if session.get('login_attempts', 0) >= 3:
-            return render_template('errors/429.html'), 429
+        # Check current count
+        attempts = session.get('login_attempts', 0)
         
+        if attempts >= 3:
+            return render_template('errors/429.html'), 429
+
         username = request.form['username']
         password = request.form['password']
-        # Find the user in the database by their username
         user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
-            session['login_attempts'] = 0
+            session['login_attempts'] = 0 # Success: Reset
             login_user(user)
-            flash('Login successful!', 'success')
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('assets.dashboard'))
+            return redirect(url_for('assets.dashboard'))
         else:
-            session['login_attempts'] = session.get('login_attempts', 0) + 1
-            logging.warning(f"Failed login attempt {session['login_attempts']} for: {username}")  
+            # Failure: Increment
+            session['login_attempts'] = attempts + 1
+            
+            # 3. Check if this specific failure was the 3rd one
             if session['login_attempts'] >= 3:
                 return render_template('errors/429.html'), 429
-            
-        flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
+                
+            flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
        
     return render_template('login.html', title="Login") 
 
