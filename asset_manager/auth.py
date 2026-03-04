@@ -54,7 +54,7 @@ def register():
 # Handles both displaying the login form (GET) and authenticating a user based on their form submission (POST)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 # Rate-limit to prevent brute-force attacks
-@limiter.limit("5 per hour", methods=["POST"]) 
+@limiter.limit("3 per hour", methods=["POST"]) 
 def login():
     # If a user is already logged in, redirect them to the main dashboard
     if current_user.is_authenticated:
