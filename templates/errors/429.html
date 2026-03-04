@@ -6,25 +6,26 @@
     flex-direction: column; 
     justify-content: center; 
     align-items: center; 
-    width: 100%; 
+    width: 100vw; 
     height: 100vh; 
     text-align: center;
 ">
     <div style="max-width: 600px; padding: 20px;">
-        <h1 style="font-size: 3rem; margin-bottom: 10px;">429</h1>
+        <h1 style="font-size: 5rem; margin-bottom: 0;">429</h1>
         <h2 style="margin-bottom: 20px;">Too Many Requests</h2>
-        <hr style="width: 50%; border: 1px solid #ccc; margin: 0 auto 20px auto;">
+        <hr style="width: 100px; border: 2px solid #94a3b8; margin: 0 auto 20px auto;">
         <p>Sorry, you have made too many requests in a short period of time.</p>
         <p style="margin-bottom: 30px;">Please wait a minute before trying again.</p>
         <a href="{{ url_for('assets.dashboard') }}" 
            style="
                 display: inline-block; 
-                padding: 10px 25px; 
+                padding: 12px 24px; 
                 background-color: #94a3b8; 
                 color: white; 
                 text-decoration: none; 
-                border-radius: 8px;
-                font-weight: bold;
+                border-radius: 6px;
+                font-weight: 600;
+                transition: background-color 0.2s;
            ">
             Return to Dashboard
         </a>
