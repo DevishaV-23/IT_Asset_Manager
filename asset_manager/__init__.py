@@ -46,6 +46,8 @@ def create_app(config_override=None):
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
     # For production environments, we want to enforce secure cookies and HTTPS. For testing, we disable these features to allow the test client to function properly.
     if not app.config.get('TESTING'):
         # Production-Grade Security for Render
