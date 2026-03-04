@@ -1,3 +1,5 @@
+from datetime import time
+
 from flask import Blueprint, render_template, redirect, session, url_for, flash, request
 from flask_login import login_required, current_user, login_user, logout_user
 from .extensions import db
@@ -58,8 +60,11 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('assets.dashboard'))
     
-    # Initialize session variables if not present
-    if request.method == 'GET' and 'login_attempts' not in session:
+    current_time = time.time()
+    last_time = session.get('last_attempt_time', 0)
+    
+    # If more than 60 seconds passed since the last failure, reset the counter
+    if current_time - last_time > 60:
         session['login_attempts'] = 0
 
     if request.method == 'POST':
