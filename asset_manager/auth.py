@@ -83,7 +83,7 @@ def login():
             if session['login_attempts'] >= 3:
                 return render_template('errors/429.html'), 429
             
-            flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
+        flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
        
     return render_template('login.html', title="Login") 
 

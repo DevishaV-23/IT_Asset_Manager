@@ -1,10 +1,10 @@
 import os
 import click
-from flask import Flask, app, redirect, url_for, flash, request, render_template
+from flask import Flask, redirect, url_for, flash, request, render_template
 from functools import wraps
 from flask_login import current_user
 from . import models
-from .extensions import db, login_manager, migrate, csrf, talisman, limiter
+from .extensions import db, login_manager, migrate, csrf, talisman
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # A custom decorator that restricts access to a route to admin users only
