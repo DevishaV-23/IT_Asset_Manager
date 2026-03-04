@@ -62,7 +62,7 @@ def login():
     last_time = session.get('last_attempt_time', 0)
     
     # If more than 60 seconds passed since the last failure, reset the counter
-    if current_time - last_time > 60:
+    if current_time - last_time > 300:
         session['login_attempts'] = 0
 
     if request.method == 'POST':
