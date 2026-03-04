@@ -1,3 +1,5 @@
+import os
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
@@ -14,7 +16,7 @@ csrf = CSRFProtect()
 talisman = Talisman()
 limiter = Limiter(
     key_func=get_remote_address, 
-    storage_uri="REDIS_URL", 
+    storage_uri=os.environ.get("REDIS_URL"), 
     strategy="fixed-window",
     swallow_errors=True
     )
