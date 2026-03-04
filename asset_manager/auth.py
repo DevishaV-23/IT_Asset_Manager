@@ -1,10 +1,8 @@
-from datetime import time
-
 from flask import Blueprint, render_template, redirect, session, url_for, flash, request
 from flask_login import login_required, current_user, login_user, logout_user
 from .extensions import db
 from .models import User
-import logging
+import time
 
 # This creates a Blueprint named 'auth'. All routes defined in this file will be prefixed with '/auth' and can be referenced with the 'auth.' endpoint
 auth_bp = Blueprint(
