@@ -20,7 +20,7 @@ The application is deployed on Render and can be accessed here: (https://it-asse
 
 * **Security:**
     * **Security Headers:** Implemented via Flask-Talisman to enforce HTTPS, XSS protection, and HSTS.
-    * **Rate Limiting:** Protects login endpoints from brute-force attacks using Flask-Limiter.
+    * **Rate Limiting:** Protects login endpoints from brute-force attacks.
     * **Secure Cookies** Cookies are flagged as Secure, HttpOnly, and SameSite=Lax.
 
 * **Full CRUD Functionality:**
@@ -36,7 +36,7 @@ The application is deployed on Render and can be accessed here: (https://it-asse
     * **Architecture:** Application Factory pattern with Flask Blueprints to separate concerns (`auth`, `assets`, `admin`).
     * **Database:** SQLAlchemy (ORM) with a SQLite backend.
     * **Authentication:** Flask-Login for secure session management.
-    * **Security:** Flask-Talisman, Flask-Limiter, and Werkzeug password hashing.
+    * **Security:** Flask-Talisman, and Werkzeug password hashing.
 
 * **Frontend:**
     * **Structure:** HTML5 with Jinja2 Templating.
