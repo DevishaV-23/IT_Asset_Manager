@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, session, url_for, flash, request
 from flask_login import login_required, current_user, login_user, logout_user
-from .extensions import db, limiter 
+from .extensions import db
 from .models import User
 import logging
 
@@ -53,26 +53,37 @@ def register():
 
 # Handles both displaying the login form (GET) and authenticating a user based on their form submission (POST)
 @auth_bp.route('/login', methods=['GET', 'POST'])
-# Rate-limit to prevent brute-force attacks
-@limiter.limit("3 per hour", methods=["POST"]) 
 def login():
     # If a user is already logged in, redirect them to the main dashboard
     if current_user.is_authenticated:
         return redirect(url_for('assets.dashboard'))
     
+    # Initialize session variables if not present
+    if 'login_attempts' not in session:
+        session['login_attempts'] = 0
+
     if request.method == 'POST':
+        if session.get('login_attempts', 0) >= 3:
+            return render_template('errors/429.html'), 429
+        
         username = request.form['username']
         password = request.form['password']
         # Find the user in the database by their username
         user = User.query.filter_by(username=username).first()
+
         if user and user.check_password(password):
+            session['login_attempts'] = 0
             login_user(user)
             flash('Login successful!', 'success')
             next_page = request.args.get('next')
             return redirect(next_page or url_for('assets.dashboard'))
         else:
-            logging.warning(f"Failed login attempt for username: {username}")
-            flash('Invalid username or password', 'danger')
+            session['login_attempts'] = session.get('login_attempts', 0) + 1
+            logging.warning(f"Failed login attempt {session['login_attempts']} for: {username}")  
+            if session['login_attempts'] >= 3:
+                return render_template('errors/429.html'), 429
+            
+            flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
        
     return render_template('login.html', title="Login") 
 

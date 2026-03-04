@@ -93,8 +93,7 @@ def create_app(config_override=None):
     login_manager.login_view = 'auth.login'
     # Connect the Flask-WTF extension for CSRF protection
     csrf.init_app(app)
-    # Connect the Limiter to the app
-    limiter.init_app(app)
+ 
 
     # This function tells Flask-Login how to load a user from the database given the user ID that is stored in the session cookie.
     @login_manager.user_loader
