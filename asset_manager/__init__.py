@@ -60,7 +60,7 @@ def create_app(config_override=None):
             REMEMBER_COOKIE_SAMESITE="Lax"
         )
         # Trust Render's Load Balancer
-        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+        # app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
         
         # Enable Talisman HTTPS/HSTS/CSP
         talisman.init_app(app, content_security_policy=None)
