@@ -14,21 +14,49 @@
         <h1 style="font-size: 5rem; margin-bottom: 0;">429</h1>
         <h2 style="margin-bottom: 20px;">Too Many Requests</h2>
         <hr style="width: 100px; border: 2px solid #94a3b8; margin: 0 auto 20px auto;">
-        <p>Sorry, you have made too many requests in a short period of time.</p>
-        <p style="margin-bottom: 30px;">Please wait a minute before trying again.</p>
-        <a href="{{ url_for('assets.dashboard') }}" 
+        
+        <p>Your access has been temporarily restricted due to too many failed login attempts.</p>
+        
+        <p style="margin-bottom: 30px; font-weight: bold; color: #ef4444;">
+            Please wait <span id="timer">60</span> seconds before trying again.
+        </p>
+
+        <a id="dashboard-btn" href="{{ url_for('assets.dashboard') }}" 
            style="
                 display: inline-block; 
                 padding: 12px 24px; 
-                background-color: #94a3b8; 
+                background-color: #cbd5e1; /* Grayed out initially */
                 color: white; 
                 text-decoration: none; 
                 border-radius: 6px;
                 font-weight: 600;
-                transition: background-color 0.2s;
+                pointer-events: none; /* Disables clicking */
+                cursor: not-allowed;
+                transition: background-color 0.3s;
            ">
             Return to Dashboard
         </a>
     </div>
 </div>
+
+<script>
+    // 60-second countdown logic
+    let timeLeft = 60;
+    const timerElement = document.getElementById('timer');
+    const btn = document.getElementById('dashboard-btn');
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        timerElement.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            // Re-enable the button
+            timerElement.parentElement.innerHTML = "You may now try again.";
+            btn.style.backgroundColor = "#94a3b8"; // Original color
+            btn.style.pointerEvents = "auto";
+            btn.style.cursor = "pointer";
+        }
+    }, 1000);
+</script>
 {% endblock %}
