@@ -18,5 +18,5 @@ limiter = Limiter(
     key_func=get_remote_address, 
     storage_uri=os.environ.get("REDIS_URL"), 
     strategy="fixed-window",
-    swallow_errors=True
+    swallow_errors=False
     )
