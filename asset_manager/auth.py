@@ -55,6 +55,7 @@ def register():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 # Rate-limit to prevent brute-force attacks
 @limiter.limit("5 per minute", override_defaults=True)    
+@limiter.exempt
 def login():
     # If a user is already logged in, redirect them to the main dashboard
     if current_user.is_authenticated:
