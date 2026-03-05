@@ -1,10 +1,10 @@
 import os
 import click
-from flask import Flask, app, redirect, url_for, flash, request, render_template
+from flask import Flask, redirect, url_for, flash, request, render_template
 from functools import wraps
 from flask_login import current_user
 from . import models
-from .extensions import db, login_manager, migrate, csrf, talisman, limiter
+from .extensions import db, login_manager, migrate, csrf, talisman
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # A custom decorator that restricts access to a route to admin users only
@@ -31,6 +31,7 @@ def create_app(config_override=None):
     if config_override: 
         app.config.update(config_override)
     else:
+        app.config['RATELIMIT_HEADERS_ENABLED'] = True
         app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-default-secret-key-for-dev')
 
     database_url = os.environ.get('DATABASE_URL')
@@ -45,6 +46,8 @@ def create_app(config_override=None):
     
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
     # For production environments, we want to enforce secure cookies and HTTPS. For testing, we disable these features to allow the test client to function properly.
     if not app.config.get('TESTING'):
         # Production-Grade Security for Render
@@ -56,8 +59,6 @@ def create_app(config_override=None):
             REMEMBER_COOKIE_HTTPONLY=True,
             REMEMBER_COOKIE_SAMESITE="Lax"
         )
-        # Trust Render's Load Balancer
-        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
         
         # Enable Talisman HTTPS/HSTS/CSP
         talisman.init_app(app, content_security_policy=None)
@@ -92,8 +93,7 @@ def create_app(config_override=None):
     login_manager.login_view = 'auth.login'
     # Connect the Flask-WTF extension for CSRF protection
     csrf.init_app(app)
-    # Connect the Limiter to the app
-    limiter.init_app(app)
+ 
 
     # This function tells Flask-Login how to load a user from the database given the user ID that is stored in the session cookie.
     @login_manager.user_loader
@@ -128,6 +128,7 @@ def create_app(config_override=None):
     @app.errorhandler(429)
     def ratelimit_handler(e):
         return render_template('errors/429.html'), 429
+    
 
     @app.errorhandler(404)
     def page_not_found(e):

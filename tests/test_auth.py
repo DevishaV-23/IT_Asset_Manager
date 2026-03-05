@@ -60,7 +60,8 @@ def test_user_can_login_and_logout(client, auth):
 
     # Login
     login_response = auth.login(username='testuser', password='password')
-    assert b'Login successful!' in login_response.data
+    assert login_response.status_code == 200
+    assert b"Dashboard" in login_response.data
 
     # Access a protected page to confirm login worked
     profile_response = client.get('/auth/profile/edit')
@@ -90,8 +91,28 @@ def test_login_with_invalid_credentials(client):
 
     # Check the user is not redirected and sees an error message
     assert response.status_code == 200
-    assert b'Login' in response.data
-    assert b'Invalid username or password' in response.data
+    assert b'Invalid credentials' in response.data
+    assert b'2 attempts remaining' in response.data
+
+def test_login_rate_limit(client):
+    """Test that 3 failed attempts trigger a 429 error"""
+    # We use a loop to simulate the 3 failed attempts
+    for i in range(2):
+        response = client.post('/auth/login', data={
+            'username': 'wronguser',
+            'password': 'wrongpassword'
+        }, follow_redirects=True)
+        # Verify the flash message is decreasing the count
+        assert f"{2 - i} attempts remaining" in response.get_data(as_text=True)
+
+    # The 3rd failed attempt should trigger the 429
+    final_response = client.post('/auth/login', data={
+        'username': 'wronguser',
+        'password': 'wrongpassword'
+    })
+    
+    assert final_response.status_code == 429
+    assert "Too Many Requests" in final_response.get_data(as_text=True)
 
 # Tests that the login page redirects to the dashboard if a user is already logged in
 def test_auth_pages_redirect_when_logged_in(client, auth):
@@ -195,12 +216,13 @@ def test_edit_profile_password_change_success(client, auth, app):
 
     # Verify the new password works for logging in
     success_response = auth.login(username='testuser', password='a-new-secret-password')
-    assert b'Login successful!' in success_response.data
+    assert success_response.status_code == 200
+    assert b'Dashboard' in success_response.data
 
     # Verify the old password NO LONGER works
     auth.logout()
     fail_response = auth.login(username='testuser', password='password')
-    assert b'Invalid username or password' in fail_response.data
+    assert b'Invalid credentials' in fail_response.data
 
 # Tests that a user cannot provide invalid data for their password
 def test_edit_profile_password_validation(client, auth):

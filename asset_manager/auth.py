@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, session, url_for, flash, request
 from flask_login import login_required, current_user, login_user, logout_user
-from .extensions import db, limiter 
+from .extensions import db
 from .models import User
-import logging
+import time
 
 # This creates a Blueprint named 'auth'. All routes defined in this file will be prefixed with '/auth' and can be referenced with the 'auth.' endpoint
 auth_bp = Blueprint(
@@ -53,33 +53,47 @@ def register():
 
 # Handles both displaying the login form (GET) and authenticating a user based on their form submission (POST)
 @auth_bp.route('/login', methods=['GET', 'POST'])
-# Rate-limit to prevent brute-force attacks
-@limiter.limit("5 per minute")    
 def login():
     # If a user is already logged in, redirect them to the main dashboard
     if current_user.is_authenticated:
         return redirect(url_for('assets.dashboard'))
     
+    current_time = time.time()
+    last_time = session.get('last_attempt_time', 0)
+    
+    # If more than 60 seconds passed since the last failure, reset the counter
+    if current_time - last_time > 300:
+        session['login_attempts'] = 0
+
     if request.method == 'POST':
+        # Check current count
+        attempts = session.get('login_attempts', 0)
+        
+        if attempts >= 3:
+            return render_template('errors/429.html'), 429
+
         username = request.form['username']
         password = request.form['password']
-        # Find the user in the database by their username
         user = User.query.filter_by(username=username).first()
-        # Check if the user exists AND if the provided password is correct
-        if user and user.check_password(password):
-            # If credentials are valid, register the user with the session
-            login_user(user)
-            next_page = request.args.get('next')
-            flash('Login successful!', 'success')
-            return redirect(next_page or url_for('assets.dashboard'))
-        else:
-            flash('Invalid username or password', 'danger')
-        # Log failed login attempts for monitoring and security purposes
-        if not user or not user.check_password(password):
-            logging.warning(f"Failed login attempt for username: {username}")
-            flash('Invalid username or password', 'danger')
 
-    return render_template('login.html', title="Login")
+        if user and user.check_password(password):
+            session['login_attempts'] = 0 # Success: Reset
+            session.pop('last_attempt_time', None)
+            login_user(user)
+            return redirect(url_for('assets.dashboard'))
+        else:
+            # Failure: Increment
+            session['login_attempts'] = attempts + 1
+            session['last_attempt_time'] = time.time()
+            session.modified = True # Forces Flask to save the session
+            
+            # Check if this specific failure was the 3rd one
+            if session['login_attempts'] >= 3:
+                return render_template('errors/429.html'), 429
+                
+            flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
+       
+    return render_template('login.html', title="Login") 
 
 # Logs the current user out
 @auth_bp.route('/logout')
