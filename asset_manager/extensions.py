@@ -10,5 +10,15 @@ db = SQLAlchemy()
 login_manager = LoginManager()
 migrate = Migrate()
 csrf = CSRFProtect()
+
+csp = {
+    'default-src': '\'self\'',
+    'script-src': '\'self\'',
+    'style-src': [
+        '\'self\'',
+        '\'unsafe-inline\''
+    ]
+}
+
 talisman = Talisman()
 

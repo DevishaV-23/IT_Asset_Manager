@@ -4,7 +4,7 @@ from flask import Flask, redirect, url_for, flash, request, render_template
 from functools import wraps
 from flask_login import current_user
 from . import models
-from .extensions import db, login_manager, migrate, csrf, talisman
+from .extensions import db, login_manager, migrate, csrf, talisman, csp
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # A custom decorator that restricts access to a route to admin users only
@@ -61,7 +61,11 @@ def create_app(config_override=None):
         )
         
         # Enable Talisman HTTPS/HSTS/CSP
-        talisman.init_app(app, content_security_policy=None)
+        talisman.init_app(
+            app,
+            content_security_policy=csp,
+            force_https=True
+)
     else:
         # Testing Environment logic
         # Check if we specifically requested 'Security Mode' 
@@ -73,7 +77,11 @@ def create_app(config_override=None):
                 SESSION_COOKIE_HTTPONLY=True,
                 WTF_CSRF_ENABLED=True
             )
-            talisman.init_app(app, content_security_policy=None)
+            talisman.init_app(
+                app,
+                content_security_policy=csp,
+                force_https=True
+            )
         else:
             # Standard functional tests (Admin, Assets, etc.)
             app.config.update(
