@@ -66,33 +66,26 @@ def login():
         session['login_attempts'] = 0
 
     if request.method == 'POST':
-        # Check current count
-        attempts = session.get('login_attempts', 0)
-        
-        if attempts >= 3:
-            return render_template('errors/429.html'), 429
-
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
 
+        # Check the password first
         if user and user.check_password(password):
-            session['login_attempts'] = 0 # Success: Reset
+            session['login_attempts'] = 0 # Reset on success
             session.pop('last_attempt_time', None)
             login_user(user)
             return redirect(url_for('assets.dashboard'))
         else:
-            # Failure: Increment
+            # If the password was WRONG, handle the rate limit
+            attempts = session.get('login_attempts', 0)
             session['login_attempts'] = attempts + 1
             session['last_attempt_time'] = time.time()
-            session.modified = True # Forces Flask to save the session
-            
-            # Check if this specific failure was the 3rd one
-            if session['login_attempts'] >= 3:
-                return render_template('errors/429.html'), 429
-                
-            flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
-       
+            session.modified = True 
+
+        if session['login_attempts'] >= 3:
+            return render_template('errors/429.html'), 429
+        
     return render_template('login.html', title="Login") 
 
 # Logs the current user out

@@ -25,7 +25,7 @@
            style="
                 display: inline-block; 
                 padding: 12px 24px; 
-                background-color: #2481f4; /* Grayed out initially */
+                background-color: #94a3b8; /* Grayed out initially */
                 color: white; 
                 text-decoration: none; 
                 border-radius: 6px;
@@ -39,24 +39,5 @@
     </div>
 </div>
 
-<script>
-    // 60-second countdown logic
-    let timeLeft = 60;
-    const timerElement = document.getElementById('timer');
-    const btn = document.getElementById('dashboard-btn');
-
-    const countdown = setInterval(() => {
-        timeLeft--;
-        timerElement.textContent = timeLeft;
-
-        if (timeLeft <= 0) {
-            clearInterval(countdown);
-            // Re-enable the button
-            timerElement.parentElement.innerHTML = "You may now try again.";
-            btn.style.backgroundColor = "#94a3b8"; // Original color
-            btn.style.pointerEvents = "auto";
-            btn.style.cursor = "pointer";
-        }
-    }, 1000);
-</script>
+<script src="{{ url_for ('static', filename= 'Script/timer.js') }}"> </script>
 {% endblock %}
