@@ -176,6 +176,7 @@ def edit_asset(asset_id):
 # Handles the deletion of an asset. This is a POST-only route. Restricted to admin users only
 @assets_bp.route('/delete/<int:asset_id>', methods=['POST'])
 @login_required
+@admin_required
 def delete_asset(asset_id):
     if current_user.role != 'admin':
         flash('You do not have permission to delete assets.', 'danger')
