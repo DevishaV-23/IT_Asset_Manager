@@ -2,6 +2,7 @@ from sqlalchemy import true
 from asset_manager.models import User
 import pytest
 from flask import session
+from flask import get_flashed_messages
 
 # Tests a user can succcesful register
 def test_user_can_register(client, app):
@@ -14,8 +15,8 @@ def test_user_can_register(client, app):
             'name': 'New Register', 
             'username': 'newregister', 
             'email': 'newregister@example.com',
-            'password': 'newpassword',
-            'confirm_password': 'newpassword'
+            'password': 'Newpassword1!',
+            'confirm_password': 'Newpassword1!'
         },
         follow_redirects=True
     )
@@ -29,10 +30,10 @@ def test_user_can_register(client, app):
 
 # Decorator runs the test function once for each set of parameters
 @pytest.mark.parametrize(('name', 'username', 'email', 'password', 'confirm_password', 'message'), (
-    ('Test', 'testuser', 'a@b.com', 'pw', 'pw', b'Username already exists.'),
-    ('Test', 'new', 'user@test.com', 'pw', 'pw', b'Email address already registered.'),
-    ('Test', 'new', 'a@b.com', 'pw1', 'pw2', b'Passwords do not match.'),
-    ('', 'new', 'a@b.com', 'pw', 'pw', b'All fields are required.'),
+    ('Test', 'testuser', 'a@b.com', 'B3st_Pr@ctice!', 'B3st_Pr@ctice!', b'Username already exists.'),
+    ('Test', 'new', 'user@test.com', 'B3st_Pr@ctice!', 'B3st_Pr@ctice!', b'Email address already registered.'),
+    ('Test', 'new', 'a@b.com', 'B3st_Pr@ctice!', 'DifferentPassword123!', b'Passwords do not match.'),
+    ('', 'new', 'a@b.com', 'B3st_Pr@ctice!', 'B3st_Pr@ctice!', b'All fields are required.'),
 ))
 
 # Tests that the registration form validates input correctly
@@ -54,6 +55,52 @@ def test_registration_validates_input(client, name, username, email, password, c
     
     # Check that the expected validation message is in the response
     assert message in response.data
+
+# Tests that the registration form enforces password complexity requirements
+def test_password_complexity_validation(client, app):
+    """Test that registration rejects passwords missing security components."""
+    
+    # List of weak passwords to test against your consolidated logic
+    weak_passwords = [
+        'short1!',      # Too short (less than 8)
+        'alllowercase1!', # Missing uppercase
+        'ALLUPPERCASE1!', # Missing lowercase
+        'NoNumbers!',     # Missing numbers
+        'NoSpecialChar1'  # Missing special character
+    ]
+
+    for weak_pw in weak_passwords:
+        with client:
+            response = client.post('/auth/register', data={
+                'name': 'Test User',
+                'username': 'testuser_complex',
+                'email': 'complex@test.com',
+                'password': weak_pw,
+                'confirm_password': weak_pw
+            }, follow_redirects=True)
+
+            # check that the user is still on registration page
+            assert response.status_code == 200
+            
+            # Verify the complexity error message was flashed
+            messages = get_flashed_messages()
+            assert any('Password must be at least 8 characters' in msg for msg in messages)
+
+# Tests that the registration form enforces password confirmation matching
+def test_password_match_validation(client, app):
+    """Test that mismatched passwords are rejected."""
+    with client:
+        client.post('/auth/register', data={
+            'name': 'Test User',
+            'username': 'mismatch_user',
+            'email': 'mismatch@test.com',
+            'password': 'StrongPassword123!',
+            'confirm_password': 'DifferentPassword123!'
+        }, follow_redirects=True)
+
+        
+        messages = get_flashed_messages()
+        assert any('Passwords do not match' in msg for msg in messages)
 
 # Tests that a user can log in and then log out successfully
 def test_user_can_login_and_logout(client, auth):

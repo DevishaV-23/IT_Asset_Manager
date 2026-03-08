@@ -37,7 +37,7 @@ def register():
         if not name or not username or not email or not password or not confirm_password:
             flash('All fields are required.', 'danger')
         elif not is_valid:
-            flash('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.', 'danger')
+            flash('Password must be at least 8 characters long and include uppercase, lowercase, number, and a special character.', 'danger')
         elif password != confirm_password:
             flash('Passwords do not match.', 'danger')
         elif User.query.filter_by(username=username).first():
