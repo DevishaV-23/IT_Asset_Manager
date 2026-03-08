@@ -147,7 +147,6 @@ body {
 
 .alert {
   width: 108%;              
-  box-sizing: border-box; 
   margin-bottom: 20px;
   word-wrap: break-word;  
   text-align: center;
