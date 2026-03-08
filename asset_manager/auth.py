@@ -88,7 +88,7 @@ def login():
             return redirect(url_for('assets.dashboard'))
         else:
             # If the password was WRONG, handle the rate limit
-            flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
+            flash(f'Invalid credentials. {2 - session["login_attempts"]} attempts remaining.', 'danger')
             attempts = session.get('login_attempts', 0)
             session['login_attempts'] = attempts + 1
             session['last_attempt_time'] = time.time()
