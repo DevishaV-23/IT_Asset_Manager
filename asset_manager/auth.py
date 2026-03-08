@@ -36,14 +36,14 @@ def register():
 
         if not name or not username or not email or not password or not confirm_password:
             flash('All fields are required.', 'danger')
+        elif not is_valid:
+            flash('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.', 'danger')
         elif password != confirm_password:
             flash('Passwords do not match.', 'danger')
         elif User.query.filter_by(username=username).first():
             flash('Username already exists.', 'danger')
         elif User.query.filter_by(email=email).first():
             flash('Email address already registered.', 'danger')
-        elif not is_valid:
-            flash('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.', 'danger')
         else:
             # If validation passes, create a new User object
             new_user = User(name=name, username=username, email=email, role=role)

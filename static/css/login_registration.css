@@ -142,6 +142,9 @@ body {
   font-weight: 600;
 }
 
-.alert{
-  width: 108%;
+.alert {
+  width: 100%; /* Change from 108% to 100% */
+  box-sizing: border-box; /* Ensures padding is included in the 100% width */
+  word-wrap: break-word; /* Wraps the long security message onto a second line */
+  margin-bottom: 20px;
 }
