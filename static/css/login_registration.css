@@ -15,6 +15,9 @@ body {
   justify-content: center;
   align-items: center;
   display: flex;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .account_page {
@@ -26,7 +29,7 @@ body {
   4px 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 450px;
- 
+  margin: 0 auto;
 }
 
 .logo {
@@ -143,8 +146,10 @@ body {
 }
 
 .alert {
-  width: 100%; /* Change from 108% to 100% */
-  box-sizing: border-box; /* Ensures padding is included in the 100% width */
-  word-wrap: break-word; /* Wraps the long security message onto a second line */
+  width: 100%;        
+  max-width: 450px;        
+  box-sizing: border-box; 
   margin-bottom: 20px;
+  word-wrap: break-word;  
+  text-align: center;
 }
