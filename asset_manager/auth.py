@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, session, url_for, flash,
 from flask_login import login_required, current_user, login_user, logout_user
 from .extensions import db
 from .models import User
-import time
+import time, re
 
 # This creates a Blueprint named 'auth'. All routes defined in this file will be prefixed with '/auth' and can be referenced with the 'auth.' endpoint
 auth_bp = Blueprint(
@@ -26,8 +26,18 @@ def register():
         confirm_password = request.form['confirm_password']
         role = request.form.get('role', 'regular') 
         # Input Validation
+        is_valid = (
+            len(password) >= 8 and
+            re.search(r'[A-Z]', password) and
+            re.search(r'[a-z]', password) and
+            re.search(r'[0-9]', password) and
+            re.search(r'[_@$!%*?&]', password)
+        )
+
         if not name or not username or not email or not password or not confirm_password:
             flash('All fields are required.', 'danger')
+        elif not is_valid:
+            flash('Password must be at least 8 characters long and include uppercase, lowercase, number, and a special character.', 'danger')
         elif password != confirm_password:
             flash('Passwords do not match.', 'danger')
         elif User.query.filter_by(username=username).first():

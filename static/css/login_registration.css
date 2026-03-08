@@ -15,6 +15,9 @@ body {
   justify-content: center;
   align-items: center;
   display: flex;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .account_page {
@@ -26,7 +29,7 @@ body {
   4px 0 10px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 450px;
- 
+  margin: 0 auto;
 }
 
 .logo {
@@ -142,6 +145,9 @@ body {
   font-weight: 600;
 }
 
-.alert{
-  width: 108%;
+.alert {
+  width: 108%;              
+  margin-bottom: 20px;
+  word-wrap: break-word;  
+  text-align: center;
 }
