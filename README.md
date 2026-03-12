@@ -21,7 +21,8 @@ The application is deployed on Render and can be accessed here: (https://it-asse
 * **Security:**
     * **Security Headers:** Implemented via Flask-Talisman to enforce HTTPS, XSS protection, and HSTS.
     * **Rate Limiting:** Protects login endpoints from brute-force attacks.
-    * **Secure Cookies** Cookies are flagged as Secure, HttpOnly, and SameSite=Lax.
+    * **Secure Cookies:** Cookies are flagged as Secure, HttpOnly, and SameSite=Lax.
+    * **Password Management:** Passwords are required to be 8 characters long, have a lowercase and uppaercase letter and include a special character and a number.
 
 * **Full CRUD Functionality:**
     * **Assets:** Users can manage a detailed inventory of IT assets, with each asset linked to a category and the user who created it for clear accountability.
@@ -119,13 +120,13 @@ Usage
 
 Username: admin
 
-Password: admin1
+Password: Oc3an_Briz3_2$
 
 # Sample User Accounts: The seeding script also creates regular user accounts, below is a regular user account:
 
 Username: Jane3
 
-Password: password123
+Password: M0unt_Ev3r3st@
 
 # Automated Testing
 # The project includes a suite of automated tests. To run them, navigate to the project's root directory and run:
