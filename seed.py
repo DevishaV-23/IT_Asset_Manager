@@ -20,7 +20,7 @@ def seed_database():
         initial_data_added = False
         if not User.query.filter_by(username='admin').first():
             admin_user = User(name='Administrator', username='admin', email='admin@example.com', role='admin')
-            admin_user.set_password('admin1')
+            admin_user.set_password('Oc3an_Briz3_2$')
             db.session.add(admin_user)
             print("Default admin user created.")
             initial_data_added = True
@@ -77,7 +77,7 @@ def seed_database():
         for u_data in sample_users:
             if not User.query.filter_by(username=u_data['username']).first():
                 user = User(name=u_data['name'], username=u_data['username'], email=u_data['email'], role='regular')
-                user.set_password('password123')
+                user.set_password('M0unt_Ev3r3st@')
                 db.session.add(user)
         
         try:

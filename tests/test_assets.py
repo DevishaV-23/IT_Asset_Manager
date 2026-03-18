@@ -1,3 +1,5 @@
+from flask import get_flashed_messages
+
 from asset_manager.models import AssetCategory, Asset,User
 from asset_manager.extensions import db
 
@@ -210,11 +212,13 @@ def test_regular_user_cannot_delete_asset(client, auth, app):
     auth.login(username='testuser', password='password')
     
     # Attempt to post to the delete endpoint
-    response = client.post(f'/assets/delete/{asset_id}', follow_redirects=True)
+    with client:
+        response = client.post(f'/assets/delete/{asset_id}', follow_redirects=False)
 
     # Check that the permission error message is shown
-    assert response.status_code == 200
-    assert b'You do not have permission to delete assets.' in response.data
+        assert response.status_code == 302
+        messages = get_flashed_messages()
+        assert any('permission' in msg.lower() for msg in messages)
 
     # Verify the asset was NOT deleted from the database
     with app.app_context():
