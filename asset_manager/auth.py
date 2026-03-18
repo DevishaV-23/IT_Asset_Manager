@@ -93,8 +93,6 @@ def login():
             session['last_attempt_time'] = time.time()
             session.modified = True 
 
-            remaining = 3 - attempts
-
         if session['login_attempts'] >= 3:
             return render_template('errors/429.html'), 429
         
