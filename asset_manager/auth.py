@@ -88,16 +88,17 @@ def login():
             return redirect(url_for('assets.dashboard'))
         else:
             # If the password was WRONG, handle the rate limit
-            attempts = session.get('login_attempts', 0) + 1
-            session['login_attempts'] = attempts
+            attempts = session.get('login_attempts', 0)
+            session['login_attempts'] = attempts + 1
             session['last_attempt_time'] = time.time()
             session.modified = True 
 
-        if attempts >= 3:
+            remaining = 3 - attempts
+
+        if session['login_attempts'] >= 3:
             return render_template('errors/429.html'), 429
         
-        remaining = 3 - attempts
-        flash(f'Invalid credentials. {remaining} attempts remaining.', 'danger')
+        flash(f'Invalid credentials. {3 - session["login_attempts"]} attempts remaining.', 'danger')
         
     return render_template('login.html', title="Login") 
 
